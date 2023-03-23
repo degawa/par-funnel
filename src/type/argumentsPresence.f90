@@ -8,6 +8,7 @@ module type_argumentsPresence
 
     type, public :: arguments_presence_type
         logical, private, allocatable :: presented(:)
+            !! presence status of optional arguments written in a namelist
     contains
         procedure, public, pass :: construct
         !* construct the `arguments_presence_type` instance
