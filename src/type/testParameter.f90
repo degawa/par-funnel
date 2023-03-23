@@ -7,7 +7,7 @@ module type_testParameter
     !>This type contains a procedure arguments
     !>and expected values that the procedure should return.
     !>
-    !>intened use is to describe multiple inputs within a unit test.
+    !>intended use is to describe multiple inputs within a unit test.
     type, public :: test_parameter_type
         character(:), public, allocatable :: arguments_namelist
             !! namelist of parameter to be passed to a procedure under test
