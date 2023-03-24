@@ -127,7 +127,7 @@ contains
         character(:), allocatable :: args
             !! the arguments not including the namelist keywords
 
-        args = drop_namelist_keywords(this%arguments_namelist, arguments_group_name)
+        args = drop_namelist_keywords(this%arguments_namelist)
     end function arguments
 
     !>returns the expected results in a string,
@@ -139,7 +139,7 @@ contains
         character(:), allocatable :: expc
             !! the expected results not including the namelist keywords
 
-        expc = drop_namelist_keywords(this%expected_namelist, expected_group_name)
+        expc = drop_namelist_keywords(this%expected_namelist)
     end function expected
 
     !------------------------------------------------------------------!
@@ -182,12 +182,10 @@ contains
     end function get_value_of
 
     !>returns the string, not including namelist keywords.
-    pure function drop_namelist_keywords(str_namelist, group_name) result(str)
+    pure function drop_namelist_keywords(str_namelist) result(str)
         implicit none
         character(*), intent(in) :: str_namelist
             !! a namelist
-        character(*), intent(in) :: group_name
-            !! namelist group name
         character(:), allocatable :: str
             !! the string not including namelist keywords
 
@@ -195,7 +193,7 @@ contains
 
         !arguments='&groupname input1=1 input2=40 /'
         !           1234567890^
-        len_header = len(namelist_start//group_name//" ")
+        len_header = index(str_namelist, " ", back=.false.)
 
         !arguments='&groupname input1=1 input2=40 /'
         !                                        1^
