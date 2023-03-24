@@ -11,7 +11,10 @@ auto-tests = true
 auto-examples = true
 
 [install]
-library = false
+library = true
+
+[preprocess]
+[preprocess.cpp]
 
 [dev-dependencies]
 test-drive = { git="https://github.com/fortran-lang/test-drive" }
