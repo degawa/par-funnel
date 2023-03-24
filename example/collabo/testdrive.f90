@@ -44,7 +44,7 @@ contains
 
         call run_test_cases(params, results)
 
-        call check(error, results%all_tests_passed(), results%get_summary_message())
+        call check(error, results%all_cases_successful(), results%get_summary_message())
     contains
         subroutine run_test_cases(params, results)
             implicit none

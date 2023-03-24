@@ -54,7 +54,7 @@ module type_testResults
         !* get failure statuses of all tesst cases
         procedure, public, pass :: append_failure_messages_to
         !* append failure message to new line of a string
-        procedure, public, pass :: all_tests_passed
+        procedure, public, pass :: all_cases_successful
         !* get status of all test cases are passed
         procedure, public, pass :: get_summary_message
         !* get summary
@@ -191,13 +191,13 @@ contains
     end subroutine append_failure_messages_to
 
     !>returns `.true.` if all test cases are successful.
-    pure logical function all_tests_passed(this)
+    pure logical function all_cases_successful(this)
         implicit none
         class(test_results_type), intent(in) :: this
             !! passed dummy argument
 
-        all_tests_passed = all(this%get_success_statuses())
-    end function all_tests_passed
+        all_cases_successful = all(this%get_success_statuses())
+    end function all_cases_successful
 
     !>retunrs summary of test caes
     !>including the number of failure test cases and failure messages.
