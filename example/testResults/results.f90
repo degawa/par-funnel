@@ -36,8 +36,7 @@ program main
     use, intrinsic :: iso_fortran_env
     use :: function_sample_under_test
     use :: par_funnel
-    use :: testdrive, only:check, error_type, to_string
-    use :: testdrive_util, only:occurred, to_string
+    use :: testdrive_util, only:to_string
     implicit none
 
     type(test_parameter_type), allocatable :: params(:)
@@ -50,7 +49,6 @@ program main
     namelist /expected/ string, less_digits
 
     type(test_results_type) :: results
-    type(error_type), allocatable :: error
 
     params = [ &
              new_test_parameter(arguments="input=1000", &
@@ -71,11 +69,9 @@ program main
 
     call run_test_cases(params, results)
 
-    call check(error, results%get_number_of_failed_cases() == 0, &
-               to_string(results%get_number_of_failed_cases())//" test(s) failed")
-    if (occurred(error)) then
-        call results%append_failure_messages_to(error%message)
-        print *, error%message
+    if (results%get_number_of_failed_cases() > 0) then
+        print *, results%get_summary_message()
+        error stop
     end if
 
 contains
