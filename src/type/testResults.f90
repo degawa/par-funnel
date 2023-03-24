@@ -15,7 +15,7 @@ module type_testResults
         logical, private :: success_status
             !! status of test result.
             !! `.true.` if the test is successful.
-        character(:), private, allocatable :: message
+        character(:), private, allocatable :: failure_message
             !! failure message.
             !! not allocated if test is successful.
     end type test_result_type
@@ -90,7 +90,7 @@ contains
             !! failure message
 
         this%test(case)%success_status = condition
-        this%test(case)%message = message
+        this%test(case)%failure_message = message
     end subroutine check_test
 
     !>returns number of test cases.
@@ -165,7 +165,7 @@ contains
         if (this%get_success_status_of(case)) then
             message = failure_message_if_test_is_successful
         else
-            message = this%test(case)%message
+            message = this%test(case)%failure_message
         end if
     end function get_failure_message_of
 
