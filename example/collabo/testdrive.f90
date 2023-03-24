@@ -9,7 +9,7 @@ contains
     subroutine intToStr_parametarized_tests_covering_optional_arg_pattern(error)
         use, intrinsic :: iso_fortran_env
         use :: par_funnel
-        use :: testdrive, only:check, error_type, to_string
+        use :: testdrive, only:check, error_type
         use :: testdrive_util, only:occurred, to_string
         implicit none
         type(error_type), allocatable, intent(out) :: error
@@ -44,11 +44,7 @@ contains
 
         call run_test_cases(params, results)
 
-        call check(error, results%get_number_of_failed_cases() == 0, &
-                   to_string(results%get_number_of_failed_cases())//" test(s) failed")
-        if (occurred(error)) then
-            call results%append_failure_messages_to(error%message)
-        end if
+        call check(error, results%all_tests_passed(), results%get_summary_message())
     contains
         subroutine run_test_cases(params, results)
             implicit none
