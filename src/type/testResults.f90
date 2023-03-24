@@ -28,7 +28,7 @@ module type_testResults
     !>
     !>for test results, this style is more convenient
     !>because it is necessary to count the number of failed tests
-    !>and to aggregate the results of all tests.
+    !>and to gather the results of all tests.
     !>@endnote
     type, public :: test_results_type
         type(test_result_type), private, allocatable :: test(:)
@@ -54,6 +54,10 @@ module type_testResults
         !* get failure statuses of all tesst cases
         procedure, public, pass :: append_failure_messages_to
         !* append failure message to new line of a string
+        procedure, public, pass :: all_tests_passed
+        !* get status of all test cases are passed
+        procedure, public, pass :: get_summary_message
+        !* get summary
     end type test_results_type
 
 contains
@@ -185,4 +189,29 @@ contains
 
         end do
     end subroutine append_failure_messages_to
+
+    !>returns `.true.` if all test cases are successful.
+    pure logical function all_tests_passed(this)
+        implicit none
+        class(test_results_type), intent(in) :: this
+            !! passed dummy argument
+
+        all_tests_passed = all(this%get_success_statuses())
+    end function all_tests_passed
+
+    !>retunrs summary of test caes
+    !>including the number of failure test cases and failure messages.
+    pure function get_summary_message(this) result(message)
+        implicit none
+        class(test_results_type), intent(in) :: this
+            !! passed dummy argument
+        character(:), allocatable :: message
+            !! stirng to be appended with new line
+
+        character(12) :: str_num_failure_test
+        write (str_num_failure_test, '(I0)') this%get_number_of_failed_cases()
+
+        message = trim(str_num_failure_test)//" test case(s) failed"
+        call this%append_failure_messages_to(message)
+    end function get_summary_message
 end module type_testResults
