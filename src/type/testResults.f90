@@ -6,29 +6,29 @@ module type_testResults
     character(*), public, parameter :: &
         failure_message_if_test_is_successful = "test passed"
 
-    !>This private type contains logical status of a test result
-    !>and a message when the test fails
-    !>
-    !>intended use is to declare the type of the collection
-    !>that contains the test results.
+    !>This private user-defined type contains
+    !>the logical status of a test result
+    !>and a message when the test fails,
+    !>and the intended use is to compose the type of collection
+    !>that stores the results of test cases.
     type, private :: test_result_type
         logical, private :: success_status
-            !! status of test result.
+            !! a status of a test result.
             !! `.true.` if the test is successful.
         character(:), private, allocatable :: failure_message
-            !! failure message.
+            !! a failure message.
             !! not allocated if test is successful.
     end type test_result_type
 
-    !>This type contains test results.
+    !>This user-defined type contains test results.
     !>
     !>@note
-    !>This type has array as the component
-    !>as opposed to declaring `test_parameter_type` as arrays.
+    !>This type has an array as the component
+    !>instead of declaring `test_parameter_type` as an array.
     !>
-    !>for test results, this style is more convenient
+    !>This style is more convenient for handling test results
     !>because it is necessary to count the number of failed tests
-    !>and to gather the results of all tests.
+    !>and gather the results of all tests.
     !>@endnote
     type, public :: test_results_type
         type(test_result_type), private, allocatable :: test(:)
@@ -38,31 +38,32 @@ module type_testResults
         !* constructs the `test_results_type` instance
 
         procedure, public, pass :: check_test
-        !* check result of the conditional formula of a test case
+        !* checks the result of the conditional formula in a test case
 
         procedure, public, pass :: get_number_of_test_cases
-        !* get number of test cases
+        !* gets the number of test cases
         procedure, public, pass :: get_number_of_failed_cases
-        !* get number of failed test cases
+        !* gets the number of failed test cases
         procedure, public, pass :: get_failure_message_of
-        !* get failure message of a test case
+        !* gets the failure message of a test case
         procedure, public, pass :: get_success_status_of
-        !* get success status of a test case
+        !* gets the success status of a test case
         procedure, public, pass :: get_success_statuses
-        !* get success statuses of all tesst cases
+        !* gets success statuses of all test cases
         procedure, public, pass :: get_failure_statuses
-        !* get failure statuses of all tesst cases
+        !* gets failure statuses of all test cases
         procedure, public, pass :: append_failure_messages_to
-        !* append failure message to new line of a string
+        !* appends a failure message to the new line of a string
         procedure, public, pass :: all_cases_successful
-        !* get status of all test cases are passed
+        !* gets the status of all test cases succeeded
         procedure, public, pass :: get_summary_message
-        !* get summary
+        !* gets summary
     end type test_results_type
 
 contains
-    !>constructs  the `test_results_type` instance.
-    !>each element of `test_result_type` collection is not initialized.
+    !>constructs the `test_results_type` instance.
+    !>
+    !>@note Each element of the `test_result_type` collection is not initialized.
     pure subroutine construct(this, test_parameters)
         use :: type_testParameter
         implicit none
@@ -70,97 +71,97 @@ contains
             !! passed dummy argument
         type(test_parameter_type), intent(in) :: test_parameters(:)
             !! test parameter type.
-            !! referring only to the array dimension
+            !! referred only to the array dimension.
 
         allocate (this%test(size(test_parameters)))
     end subroutine construct
 
-    !>check result of the conditional formula of a test case
-    !>and store it to an element of `test_result_type` collection.
+    !>checks the result for the conditional formula of a test case
+    !>and stores it to an element of the `test_result_type` collection.
     pure subroutine check_test(this, case, condition, message)
         implicit none
         class(test_results_type), intent(inout) :: this
             !! passed dummy argument
         integer(int32), intent(in) :: case
-            !! test case number
+            !! a test case number
         logical, intent(in) :: condition
-            !! result of the conditional formula
+            !! the result of the conditional formula
             !! for test success/failure evaluation
         character(*), intent(in) :: message
-            !! failure message
+            !! the failure message
 
         this%test(case)%success_status = condition
         this%test(case)%failure_message = message
     end subroutine check_test
 
-    !>returns number of test cases.
+    !>returns the number of test cases.
     pure function get_number_of_test_cases(this) result(num)
         implicit none
         class(test_results_type), intent(in) :: this
             !! passed dummy argument
         integer(int32) :: num
-            !! number of test cases
+            !! the number of test cases
 
         num = size(this%test)
     end function get_number_of_test_cases
 
-    !>returns number of failed test cases.
+    !>returns the number of failed test cases.
     pure function get_number_of_failed_cases(this) result(num)
         implicit none
         class(test_results_type), intent(in) :: this
             !! passed dummy argument
         integer(int32) :: num
-            !! number of failed test cases
+            !! the number of failed test cases
 
         num = count(this%get_failure_statuses())
     end function get_number_of_failed_cases
 
-    !>returns logical array where **success cases are `.true.`**
+    !>returns the logical array where **success cases are `.true.`**
     pure function get_success_statuses(this) result(stat)
         implicit none
         class(test_results_type), intent(in) :: this
             !! passed dummy argument
         logical, allocatable :: stat(:)
-            !! logical statuses of test results
+            !! the logical statuses with the test success as `.true.`
 
         stat = this%test(:)%success_status
     end function get_success_statuses
 
-    !>returns logical array where **failed cases are `.true.`**
+    !>returns the logical array where **failed cases are `.true.`**
     pure function get_failure_statuses(this) result(stat)
         implicit none
         class(test_results_type), intent(in) :: this
             !! passed dummy argument
         logical, allocatable :: stat(:)
-            !! logical statuses of test results
+            !! the logical statuses with the test failed as `.true.`
 
         stat = .not. this%get_success_statuses()
     end function get_failure_statuses
 
-    !>returns result of a test case
+    !>returns the result of a test case
     !>in logical value with success as `.true.`
     pure function get_success_status_of(this, case) result(stat)
         implicit none
         class(test_results_type), intent(in) :: this
             !! passed dummy argument
         integer(int32), intent(in) :: case
-            !! test case number
+            !! a test case number
         logical :: stat
             !! logical status (`.true.` for success)
 
         stat = this%test(case)%success_status
     end function get_success_status_of
 
-    !>returns failure message
-    !>and returns "test passed" if a test is successful.
+    !>returns the failure message
+    !>and "test passed" if a test is successful.
     pure function get_failure_message_of(this, case) result(message)
         implicit none
         class(test_results_type), intent(in) :: this
             !! passed dummy argument
         integer(int32), intent(in) :: case
-            !! test case number
+            !! a test case number
         character(:), allocatable :: message
-            !! message
+            !! the failure message
 
         if (this%get_success_status_of(case)) then
             message = failure_message_if_test_is_successful
@@ -169,13 +170,14 @@ contains
         end if
     end function get_failure_message_of
 
-    !>appends failure messages of failed test case.
+    !>appends failure messages of failed test cases
+    !>to the `message`.
     pure subroutine append_failure_messages_to(this, message)
         implicit none
         class(test_results_type), intent(in) :: this
             !! passed dummy argument
         character(:), allocatable, intent(inout) :: message
-            !! stirng to be appended with new line
+            !! the string to be appended with the new line
 
         integer(int32) :: case
         character(12) :: case_str
@@ -199,14 +201,14 @@ contains
         all_cases_successful = all(this%get_success_statuses())
     end function all_cases_successful
 
-    !>retunrs summary of test caes
-    !>including the number of failure test cases and failure messages.
+    !>returns a summary of test cases,
+    !>including the number of failed cases and failure messages.
     pure function get_summary_message(this) result(message)
         implicit none
         class(test_results_type), intent(in) :: this
             !! passed dummy argument
         character(:), allocatable :: message
-            !! stirng to be appended with new line
+            !! a summary in string
 
         character(12) :: str_num_failure_test
         write (str_num_failure_test, '(I0)') this%get_number_of_failed_cases()

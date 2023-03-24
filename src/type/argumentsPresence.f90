@@ -6,17 +6,21 @@ module type_argumentsPresence
     public :: operator(.has.)
     public :: operator(==)
 
+    !>This user-defined type contains the presence status of arguments
+    !>in the arguments namelist,
+    !>and the intended use is to check the presence status of arguments
+    !>and branch procedure calls within a unit test.
     type, public :: arguments_presence_type
         logical, private, allocatable :: presented(:)
-            !! presence status of optional arguments written in a namelist
+            !! presence status of optional arguments in the namelist
     contains
         procedure, public, pass :: construct
-        !* construct the `arguments_presence_type` instance
+        !* constructs the `arguments_presence_type` instance
 
         procedure, public, pass :: eqv_type
-        !* equality operation between `arguments_presence_type` and `arguments_presence_type`
+        !* gets the equality between a `arguments_presence_type` and a `arguments_presence_type`
         procedure, public, pass :: eqv_logical
-        !* equality operation between `arguments_presence_type` and logical array
+        !* gets the equality between a `arguments_presence_type` and a logical array
     end type arguments_presence_type
 
     interface arguments_presence
@@ -51,18 +55,18 @@ contains
     end function construct_arguments_presence_type
 
     !>constructs the `arguments_presence_type` instance
-    !>based on presence status of optional arguments written in a namelist
+    !>based on the presence statuses of optional arguments in the namelist
     subroutine construct(this, presented)
         implicit none
         class(arguments_presence_type), intent(inout) :: this
             !! passed dummy argument
         logical :: presented(:)
-            !! presence status of optional arguments
+            !! presence statuses of optional arguments
 
         allocate (this%presented, source=presented)
     end subroutine construct
 
-    !>returns `.true.` if all the value of component `presented`
+    !>returns `.true.` if all the values of component `presented`
     !>are equivalent and `.false.` otherwise.
     !>
     !>This function is referenced via the overloaded operator `==`
@@ -70,9 +74,9 @@ contains
         implicit none
         class(arguments_presence_type), intent(in) :: lhs
             !! passed dummy argument<br>
-            !! left-hand side of the operator
+            !! the left-hand side of the operator
         class(arguments_presence_type), intent(in) :: rhs
-            !! right-hand side of the operator
+            !! the right-hand side of the operator
 
         if (are_different_shape(lhs%presented, rhs%presented)) then
             eqv_type = .false.
@@ -82,17 +86,17 @@ contains
         eqv_type = all(lhs%presented .eqv. rhs%presented)
     end function eqv_type
 
-    !>returns `.true.` if all the value of components `presented`
-    !>and logical array are equivalent, and `.false.` otherwise.
+    !>returns `.true.` if all the values of components `presented`
+    !>and logical array are equivalent and `.false.` otherwise.
     !>
     !>This function is referenced via the overloaded operator `.has.`
     pure logical function eqv_logical(lhs, rhs)
         implicit none
         class(arguments_presence_type), intent(in) :: lhs
             !! passed dummy argument<br>
-            !! left-hand side of the operator
+            !! the left-hand side of the operator
         logical, intent(in) :: rhs(:)
-            !! right-hand side of the operator
+            !! the right-hand side of the operator
 
         if (are_different_shape(lhs%presented, rhs)) then
             eqv_logical = .false.
@@ -122,7 +126,7 @@ contains
     end function eqv_logical_logical
 
     !------------------------------------------------------------------!
-    !>returns `.true.` if `a` and `b` have the different shape.
+    !>returns `.true.` if `a` and `b` have different shapes.
     pure logical function are_different_shape(a, b)
         implicit none
         logical, intent(in) :: a(:)
