@@ -15,7 +15,7 @@ module type_testResults
         logical, private :: success_status
             !! status of test result.
             !! `.true.` if the test is successful.
-        character(:), public, allocatable :: message
+        character(:), private, allocatable :: message
             !! failure message.
             !! not allocated if test is successful.
     end type test_result_type
