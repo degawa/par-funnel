@@ -90,13 +90,13 @@ program main
             arg_pres = arguments_presence([params(case)%presented("fmt"), &
                                            params(case)%presented("less_digits")])
             !&<
-            if (arg_pres .is. [.false., .false.]) &
+            if (arg_pres .has. [.false., .false.]) &
                 act_string = int_to_str(input)
-            if (arg_pres .is. [.true., .false.]) &
+            if (arg_pres .has. [.true., .false.]) &
                 act_string = int_to_str(input, fmt)
-            if (arg_pres .is. [.false., .true.]) &
+            if (arg_pres .has. [.false., .true.]) &
                 act_string = int_to_str(input, less_digits=less_digits)
-            if (arg_pres .is. [.true., .true.]) &
+            if (arg_pres .has. [.true., .true.]) &
                 act_string = int_to_str(input, fmt, less_digits)
             !&>
 

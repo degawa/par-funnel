@@ -3,7 +3,7 @@ module type_argumentsPresence
     implicit none
     private
     public :: arguments_presence
-    public :: operator(.is.)
+    public :: operator(.has.)
     public :: operator(==)
 
     type, public :: arguments_presence_type
@@ -30,10 +30,10 @@ module type_argumentsPresence
         procedure :: eqv_type
     end interface
 
-    !>declare `.is.` operator
+    !>declare `.has.` operator
     !>
-    !>@note to work with ifort, `generic :: operator(.is.)=>eqv_logical` is not used.
-    interface operator(.is.)
+    !>@note to work with ifort, `generic :: operator(.has.)=>eqv_logical` is not used.
+    interface operator(.has.)
         procedure :: eqv_logical
     end interface
 
@@ -84,7 +84,7 @@ contains
     !>returns `.true.` if all the value of components `presented`
     !>and logical array are equivalent, and `.false.` otherwise.
     !>
-    !>This function is referenced via the overloaded operator `==`
+    !>This function is referenced via the overloaded operator `.has.`
     pure logical function eqv_logical(lhs, rhs)
         implicit none
         class(arguments_presence_type), intent(in) :: lhs
