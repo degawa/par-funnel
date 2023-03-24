@@ -28,6 +28,7 @@ module type_argumentsPresence
     !>@note to work with ifort, `generic :: operator(==)=>eqv_type` is not used.
     interface operator(==)
         procedure :: eqv_type
+        procedure :: eqv_logical_logical
     end interface
 
     !>declare `.has.` operator
@@ -100,6 +101,25 @@ contains
 
         eqv_logical = all(lhs%presented .eqv. rhs)
     end function eqv_logical
+
+    !>returns `.true.` if two logical arrays are equivalent
+    !>and `.false.` otherwise.
+    !>
+    !>This function is referenced via the overloaded operator `==`
+    pure logical function eqv_logical_logical(lhs, rhs)
+        implicit none
+        logical, intent(in) :: lhs(:)
+            !! the left-hand side of the operator
+        logical, intent(in) :: rhs(:)
+            !! the right-hand side of the operator
+
+        if (are_different_shape(lhs, rhs)) then
+            eqv_logical_logical = .false.
+            return
+        end if
+
+        eqv_logical_logical = all(lhs .eqv. rhs)
+    end function eqv_logical_logical
 
     !------------------------------------------------------------------!
     !>returns `.true.` if `a` and `b` have the different shape.
