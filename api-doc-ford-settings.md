@@ -1,7 +1,6 @@
 ---
 output_dir: ./api-doc
 src_dir: ./src
-         ./example
 project: par-funnel
 project_github: https://github.com/degawa/par-funnel
 summary: Fortran unit test parameterizer using namelist
