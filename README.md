@@ -224,10 +224,10 @@ do case = 1, results%get_number_of_test_cases()
 end do
 ```
 
-Some type-bound procedures, such as `get_number_of_failed_cases`, `all_tests_passed`, and `get_results_message`, are available to confirm a kind of test summary.
+Some type-bound procedures, such as `get_number_of_failed_cases`, `all_cases_successful`, and `get_summary_message`, are available to confirm a kind of test summary.
 ```Fortran
 if (results%get_number_of_failed_cases() > 0) then
-    print *, results%get_results_message()
+    print *, results%get_summary_message()
     error stop
 end if
 ```
@@ -243,10 +243,10 @@ An example of collaboration with test-drive, a community-made unit test framewor
 A significant change from `example/testResults/results.f90` is to replace the checking results with a procedure call provided by test-drive.
 ```diff
 - if (results%get_number_of_failed_cases() > 0) then
--     print *, results%get_results_message()
+-     print *, results%get_summary_message()
 -     error stop
 - end if
-+ call check(error, results%all_tests_passed(), results%get_summary_message())
++ call check(error, results%all_cases_successful(), results%get_summary_message())
 ```
 
 The test-drive requires making at least one test suite gathering unit tests like the below:
