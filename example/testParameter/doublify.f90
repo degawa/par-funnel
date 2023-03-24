@@ -10,7 +10,7 @@ contains
         integer(int32), intent(in) :: input
         integer(int32) :: output
 
-        output = input + 2 ! mistake
+        output = input + 2 ! correct formula is output = input*2
     end function doublify
 end module function_doublify_under_test
 
@@ -52,7 +52,7 @@ program main
                 print *, "          actual   : ", actual
             end if
         end do
-        !|
+        !|### Execution result
         !```console
         ![FAILED]: doublify() should return 2 when input 1
         !          expected :            2

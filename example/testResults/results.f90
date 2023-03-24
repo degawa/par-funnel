@@ -135,4 +135,33 @@ contains
 
         end do
     end subroutine run_test_cases
+    !|### Execution result
+    !In this example, all test cases will pass, and no message will be output.
+    !Replacing `cond` with `.false.` in `call results%check_test(case, cond, message)`,
+    !placed a few lines above,
+    !forces all test cases to fail and the message output below:
+    !
+    !    7 test case(s) failed
+    !case 1: int_to_str() should return string='1000' when input input=1000
+    !    expected : 1000
+    !    actual   : 1000
+    !case 2: int_to_str() should return string='1000' when input input=1000 fmt='(I4)'
+    !    expected : 1000
+    !    actual   : 1000
+    !case 3: int_to_str() should return string='**' when input input=1000 fmt='(I2)'
+    !    expected : **
+    !    actual   : **
+    !case 4: int_to_str() should return string='1000' less_digits=false when input input=1000 less_digits=true
+    !    expected : 1000, F
+    !    actual   : 1000, F
+    !case 5: int_to_str() should return string='1000' less_digits=false when input input=1000 less_digits=false
+    !    expected : 1000, F
+    !    actual   : 1000, F
+    !case 6: int_to_str() should return string='1000' less_digits=false when input input=1000 fmt='(I4)' less_digits=false
+    !    expected : 1000, F
+    !    actual   : 1000, F
+    !case 7: int_to_str() should return string='**' less_digits=true when input input=1000 fmt='(I2)' less_digits=false
+    !    expected : **, T
+    !    actual   : **, T
+    !ERROR STOP
 end program main

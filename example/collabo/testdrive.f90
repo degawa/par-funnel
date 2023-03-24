@@ -26,7 +26,7 @@ contains
         type(test_results_type) :: results
 
         params = [ &
-                 new_test_parameter(arguments="input=000", &
+                 new_test_parameter(arguments="input=000", & ! correct input is input=1000
                                     expected="string='1000'") &
                  , new_test_parameter(arguments="input=1000 fmt='(I4)'", &
                                       expected="string='1000'") &
@@ -36,7 +36,7 @@ contains
                                       expected="string='1000' less_digits=false") &
                  , new_test_parameter(arguments="input=1000 less_digits=false", &
                                       expected="string='1000' less_digits=false") &
-                 , new_test_parameter(arguments="input=000 fmt='(I4)' less_digits=false", &
+                 , new_test_parameter(arguments="input=000 fmt='(I4)' less_digits=false", & ! correct input is input=1000
                                       expected="string='1000' less_digits=false") &
                  , new_test_parameter(arguments="input=1000 fmt='(I2)' less_digits=false", &
                                       expected="string='**' less_digits=true") &
@@ -165,7 +165,7 @@ program collab_testdrive
                   new_testsuite("collaboration with testdrive", collect) &
                   ]
     call run_test(test_suites)
-    !|
+    !|### Execution result
     !```console
     !# Testing: collaboration with testdrive
     !  Starting int_to_str() parametarized tests covering optional arguments pattern ... (1/1)

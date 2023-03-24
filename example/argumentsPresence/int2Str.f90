@@ -118,5 +118,13 @@ program main
                 end if
             end if
         end do
+        !|### Execution result
+        ![PASSED]: int_to_str() should return string='1000' when input input=1000
+        ![PASSED]: int_to_str() should return string='1000' when input input=1000 fmt='(I4)'
+        ![PASSED]: int_to_str() should return string='**' when input input=1000 fmt='(I2)'
+        ![PASSED]: int_to_str() should return string='1000' less_digits=false when input input=1000 less_digits=true
+        ![PASSED]: int_to_str() should return string='1000' less_digits=false when input input=1000 less_digits=false
+        ![PASSED]: int_to_str() should return string='1000' less_digits=false when input input=1000 fmt='(I4)' less_digits=false
+        ![PASSED]: int_to_str() should return string='**' less_digits=true when input input=1000 fmt='(I2)' less_digits=false
     end block
 end program main
