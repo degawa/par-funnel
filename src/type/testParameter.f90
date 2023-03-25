@@ -145,11 +145,11 @@ contains
     !------------------------------------------------------------------!
     !>returns the key's value retrieved from `"key=val"` format
     !>written in the `string`.
-    pure function get_value_of(key, string) result(val)
+    pure function get_value_of(key, str_namelist) result(val)
         implicit none
         character(*), intent(in) :: key
             !! a key of the arguments or expected resutls
-        character(*), intent(in) :: string
+        character(*), intent(in) :: str_namelist
             !! a namelist
         character(:), allocatable :: val
             !! the key's value written in the namelist
@@ -160,7 +160,7 @@ contains
         !
         !arguments='&groupname input1=1 input2=40 /'
         !           1234567890123456789^
-        key_pos = index(string, " "//key//"=")
+        key_pos = index(str_namelist, " "//key//"=")
 
         !                      key_pos v
         !arguments='&groupname input1=1 input2=40 /'
@@ -172,13 +172,13 @@ contains
         !arguments='&groupname input1=1 input2=40 /'
         !                                      --^
         !                                     val_len
-        val_len = index(string(val_head_pos:), " ") - 1
+        val_len = index(str_namelist(val_head_pos:), " ") - 1
 
         !                         val_head_pos v
         !arguments='&groupname input1=1 input2=40 /'
         !                                      -^
         !                                      12
-        val = string(val_head_pos:val_head_pos + val_len - 1)
+        val = str_namelist(val_head_pos:val_head_pos + val_len - 1)
     end function get_value_of
 
     !>returns the string, not including namelist keywords.
