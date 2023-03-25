@@ -115,6 +115,8 @@ contains
         character(:), allocatable :: val
             !! the value of the expected result
 
+        ! this%presented() cannot detect `expected` key
+        ! that is not contained in expected_namelist
         val = get_value_of(expected, this%expected_namelist)
     end function get_expected_value_of
 
@@ -161,6 +163,12 @@ contains
         !arguments='&groupname input1=1 input2=40 /'
         !           1234567890123456789^
         key_pos = index(str_namelist, " "//key//"=")
+
+        ! if key does not exist in `str_namelist`
+        if (key_pos == 0) then
+            val = ""
+            return
+        end if
 
         !                      key_pos v
         !arguments='&groupname input1=1 input2=40 /'
