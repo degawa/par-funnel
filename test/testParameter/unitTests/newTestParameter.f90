@@ -19,13 +19,6 @@ contains
 
         call check(error, same_type_as(new_test_parameter("", ""), param), &
                    "expected 'test_parameter_type' instance, but got not it")
-    contains
-        !
-        subroutine setup()
-        end subroutine setup
-        !
-        subroutine teardown()
-        end subroutine teardown
     end subroutine newTestParam_should_return_test_parameter_type_instance
 
     subroutine newTestParam_should_return_instance_that_having_namelists(error)

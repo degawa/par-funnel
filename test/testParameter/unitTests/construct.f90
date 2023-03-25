@@ -36,8 +36,8 @@ contains
     contains
         !
         subroutine setup(arguments, expected, expected_arguments_namelist)
-            character(:), allocatable, intent(inout) :: arguments, expected
-            character(:), allocatable, intent(inout) :: expected_arguments_namelist
+            character(:), allocatable, intent(out) :: arguments, expected
+            character(:), allocatable, intent(out) :: expected_arguments_namelist
 
             arguments = "input1=1 input2=10 input3=4"
             expected = ""
@@ -74,8 +74,8 @@ contains
     contains
         !
         subroutine setup(arguments, expected, expected_expected_namelist)
-            character(:), allocatable, intent(inout) :: arguments, expected
-            character(:), allocatable, intent(inout) :: expected_expected_namelist
+            character(:), allocatable, intent(out) :: arguments, expected
+            character(:), allocatable, intent(out) :: expected_expected_namelist
 
             arguments = ""
             expected = "output1=2 output2=20"

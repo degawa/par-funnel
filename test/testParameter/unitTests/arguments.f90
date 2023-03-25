@@ -35,8 +35,8 @@ contains
     contains
         !
         subroutine setup(param, expected_arguments)
-            type(test_parameter_type), intent(inout) :: param
-            character(:), allocatable, intent(inout) :: expected_arguments
+            type(test_parameter_type), intent(out) :: param
+            character(:), allocatable, intent(out) :: expected_arguments
 
             expected_arguments = "input1=1 input2=10 input3=4"
             call param%construct("input1=1 input2=10 input3=4", "")

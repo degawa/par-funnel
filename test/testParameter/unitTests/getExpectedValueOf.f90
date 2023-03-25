@@ -51,7 +51,7 @@ contains
     contains
         !
         subroutine setup(param, key, expected)
-            type(test_parameter_type), intent(inout) :: param
+            type(test_parameter_type), intent(out) :: param
             type(string_type), allocatable, intent(out) :: key(:)
             type(string_type), allocatable, intent(out) :: expected(:)
 
@@ -100,9 +100,9 @@ contains
     contains
         !
         subroutine setup(param, key, expected_int)
-            type(test_parameter_type), intent(inout) :: param
-            type(string_type), allocatable, intent(inout) :: key(:)
-            integer(int32), allocatable, intent(inout) :: expected_int(:)
+            type(test_parameter_type), intent(out) :: param
+            type(string_type), allocatable, intent(out) :: key(:)
+            integer(int32), allocatable, intent(out) :: expected_int(:)
 
             call param%construct("", "output1=3 value=5 output2=10")
             read (unit=param%expected_namelist, nml=expected)

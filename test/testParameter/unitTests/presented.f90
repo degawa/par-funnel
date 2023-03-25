@@ -45,9 +45,9 @@ contains
     contains
         !
         subroutine setup(param, key, presented)
-            type(test_parameter_type), intent(inout) :: param
-            type(string_type), allocatable, intent(inout) :: key(:)
-            logical, allocatable, intent(inout) :: presented(:)
+            type(test_parameter_type), intent(out) :: param
+            type(string_type), allocatable, intent(out) :: key(:)
+            logical, allocatable, intent(out) :: presented(:)
 
             call param%construct("input1=1 input2=10 input3=4 input4=5", "")
             key = [string_type("input4"), string_type("input1"), string_type("input2"), string_type("input3")]
@@ -83,9 +83,9 @@ contains
     contains
         !
         subroutine setup(param, key, not_presented)
-            type(test_parameter_type), intent(inout) :: param
-            type(string_type), allocatable, intent(inout) :: key(:)
-            logical, allocatable, intent(inout) :: not_presented(:)
+            type(test_parameter_type), intent(out) :: param
+            type(string_type), allocatable, intent(out) :: key(:)
+            logical, allocatable, intent(out) :: not_presented(:)
 
             call param%construct("input1=1 input2=10 input3=4 input4=5", "")
             key = [string_type("input5"), string_type("input6"), string_type("input7"), string_type("input8")]
