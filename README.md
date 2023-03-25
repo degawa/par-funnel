@@ -64,7 +64,7 @@ Add the following `use` statement to modules or procedures calling par-funnel.
 use :: par_funnel
 ```
 
-Note that the source file name is parFunel.f90, but the module name is par_funnel.
+Note that the source file name is parFunnel.f90, but the module name is par_funnel.
 
 ### Reference as a fpm project's dependency
 To use par-funnel in your fpm project, add the following to the fpm.toml.
@@ -260,7 +260,7 @@ test_suite = [ &
              , new_unittest("doublify(), it should return -2 when input -1", &
                             doublify_should_return_minus_4_when_input_minus_1) &
              , new_unittest("doublify(), it should return 0 when input 0", &
-                            doublify_should_return_9_when_input_0) &
+                            doublify_should_return_0_when_input_0) &
              ]
 ```
 
