@@ -21,6 +21,8 @@ module type_argumentsPresence
         !* gets the equality between a `arguments_presence_type` and a `arguments_presence_type`
         procedure, public, pass :: eqv_logical
         !* gets the equality between a `arguments_presence_type` and a logical array
+        procedure, public, pass(rhs) :: eqv_logical_type
+        !* gets the equality between a logical array and a `arguments_presence_type`
     end type arguments_presence_type
 
     interface arguments_presence
@@ -33,6 +35,7 @@ module type_argumentsPresence
     interface operator(==)
         procedure :: eqv_type
         procedure :: eqv_logical_logical
+        procedure :: eqv_logical_type
     end interface
 
     !>declare `.has.` operator
@@ -105,6 +108,18 @@ contains
 
         eqv_logical = all(lhs%presented .eqv. rhs)
     end function eqv_logical
+
+    !>This function is referenced via the overloaded operator `.has.`
+    pure logical function eqv_logical_type(lhs, rhs)
+        implicit none
+        logical, intent(in) :: lhs(:)
+            !! the right-hand side of the operator
+        class(arguments_presence_type), intent(in) :: rhs
+            !! passed dummy argument<br>
+            !! the left-hand side of the operator
+
+        eqv_logical_type = (rhs.has.lhs)
+    end function eqv_logical_type
 
     !>returns `.true.` if two logical arrays are equivalent
     !>and `.false.` otherwise.
