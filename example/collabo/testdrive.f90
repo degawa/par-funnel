@@ -15,14 +15,6 @@ contains
         type(error_type), allocatable, intent(out) :: error
 
         type(test_parameter_type), allocatable :: params(:)
-        integer(int32) :: input
-        character(32) :: fmt
-        logical :: less_digits
-        character(12) :: string
-
-        namelist /arguments/ input, fmt, less_digits
-        namelist /expected/ string, less_digits
-
         type(test_results_type) :: results
 
         params = [ &
@@ -50,6 +42,14 @@ contains
             implicit none
             type(test_parameter_type), intent(in) :: params(:)
             type(test_results_type), intent(inout) :: results
+
+            integer(int32) :: input
+            character(32) :: fmt
+            logical :: less_digits
+            character(12) :: string
+
+            namelist /arguments/ input, fmt, less_digits
+            namelist /expected/ string, less_digits
 
             character(12) :: exp_string
             character(:), allocatable :: act_string
