@@ -3,10 +3,10 @@ module collab_testdrive_unittests
     use :: par_funnel
     implicit none
     private
-    public :: intToStr_parametarized_tests_covering_optional_arg_pattern
+    public :: intToStr_parametarized_tests_covering_optional_arg_combination
 
 contains
-    subroutine intToStr_parametarized_tests_covering_optional_arg_pattern(error)
+    subroutine intToStr_parametarized_tests_covering_optional_arg_combination(error)
         use, intrinsic :: iso_fortran_env
         use :: par_funnel
         use :: testdrive, only:check, error_type
@@ -106,7 +106,7 @@ contains
 
             end do
         end subroutine run_test_cases
-    end subroutine intToStr_parametarized_tests_covering_optional_arg_pattern
+    end subroutine intToStr_parametarized_tests_covering_optional_arg_combination
 
     function int_to_str(i32, fmt, less_digits) result(str)
         use, intrinsic :: iso_fortran_env
@@ -147,8 +147,8 @@ contains
             !! collection of tests
 
         test_suite = [ &
-                     new_unittest("int_to_str() parametarized tests covering optional arguments pattern", &
-                                  intToStr_parametarized_tests_covering_optional_arg_pattern, should_fail=.true.) &
+                     new_unittest("int_to_str() parametarized tests covering optional arguments combinations", &
+                                  intToStr_parametarized_tests_covering_optional_arg_combination, should_fail=.true.) &
                      ]
     end subroutine collect
 end module collab_testdrive_collect
