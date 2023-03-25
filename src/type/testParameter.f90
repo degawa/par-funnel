@@ -85,7 +85,7 @@ contains
         presented = (index(this%arguments_namelist, " "//argument//"=") > 0)
     end function presented
 
-    !>returns the key's value retrieved from `" key=val "` format
+    !>returns the key's value retrieved from `"key=val"` format
     !>written in the component `arguments`.
     pure function get_argument_value_of(this, argument) result(val)
         implicit none
@@ -104,7 +104,7 @@ contains
         val = get_value_of(argument, this%arguments_namelist)
     end function get_argument_value_of
 
-    !>returns the key's value retrieved from `" key=val "` format
+    !>returns the key's value retrieved from `"key=val"` format
     !>written in the component `expected`.
     pure function get_expected_value_of(this, expected) result(val)
         implicit none
@@ -143,7 +143,7 @@ contains
     end function expected
 
     !------------------------------------------------------------------!
-    !>returns the key's value retrieved from `" key=val "` format
+    !>returns the key's value retrieved from `"key=val"` format
     !>written in the `string`.
     pure function get_value_of(key, string) result(val)
         implicit none
