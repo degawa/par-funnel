@@ -168,9 +168,9 @@ program collab_testdrive
     !|### Execution result
     !```console
     !# Testing: collaboration with testdrive
-    !  Starting int_to_str() parametarized tests covering optional arguments pattern ... (1/1)
-    !       ... int_to_str() parametarized tests covering optional arguments pattern [EXPECTED FAIL]
-    !  Message: 2 test(s) failed
+    !  Starting int_to_str() parametarized tests covering optional arguments combinations ... (1/1)
+    !       ... int_to_str() parametarized tests covering optional arguments combinations [EXPECTED FAIL]
+    !  Message: 2 test case(s) failed
     !case 1: int_to_str() should return string='1000' when input input=000
     !    expected : 1000
     !    actual   : 0
