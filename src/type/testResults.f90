@@ -180,14 +180,12 @@ contains
             !! the string to be appended with the new line
 
         integer(int32) :: case
-        character(12) :: case_str
 
         do concurrent(case=1:this%get_number_of_test_cases(), &
                       this%get_success_status_of(case) .eqv. .false.)
 
-            write (case_str, '(I0)') case
             message = message//new_line(" ")// &
-                      "case "//trim(case_str)//": "//this%get_failure_message_of(case)
+                      "case "//to_string(case)//": "//this%get_failure_message_of(case)
 
         end do
     end subroutine append_failure_messages_to
@@ -210,10 +208,21 @@ contains
         character(:), allocatable :: message
             !! a summary in string
 
-        character(12) :: str_num_failure_test
-        write (str_num_failure_test, '(I0)') this%get_number_of_failed_cases()
-
-        message = trim(str_num_failure_test)//" test case(s) failed"
+        message = to_string(this%get_number_of_failed_cases())//" test case(s) failed"
         call this%append_failure_messages_to(message)
     end function get_summary_message
+
+    !------------------------------------------------------------------!
+    !>returns the string converted from the integer.
+    pure function to_string(i32) result(str)
+        implicit none
+        integer(int32), intent(in) :: i32
+            !! the integer to be converted
+        character(:), allocatable :: str
+            !! the string coverted from the integer
+
+        character(12) :: buffer
+        write (buffer, '(I0)') i32
+        str = trim(adjustl(buffer))
+    end function to_string
 end module type_testResults
