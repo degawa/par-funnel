@@ -14,10 +14,12 @@ contains
         type(unittest_type), allocatable :: test_suite_ll(:)
 
         test_suite_ll = [ &
-                        new_unittest("eqv_logical_logical(), parameterized test for comparision of size-2 arrays.", &
-                                     eqvLL_parameterized_compare_size_2_arrays) &
-                        , new_unittest("eqv_logical_logical(), parameterized test for comparision of arrays with size-2 and 3.", &
-                                       eqvLL_parameterized_compare_btw_arrays_w_size_2_and_3) &
+                        new_unittest("eqv_logical_logical(), it should return true when 2 arrays have the same values.", &
+                                     eqvLL_should_return_true_when_2_arrays_have_same_values) &
+                        , new_unittest("eqv_logical_logical(), it should return false when 2 arrays have diffelent values.", &
+                                       eqvLL_should_return_false_when_2_arrays_have_diffelent_values) &
+                        , new_unittest("eqv_logical_logical(), it should return false when 2 arrays have diffelent shapes.", &
+                                       eqvLL_should_return_false_when_2_arrays_have_different_shapes) &
                         ]
 
         test_suite = [test_suite_ll]

@@ -5,74 +5,89 @@ module refactor_test_argumentsPresence_unitTests_eqvLogicalLogical
     use :: par_funnel
     implicit none
     private
-    public :: eqvLL_parameterized_compare_size_2_arrays
-    public :: eqvLL_parameterized_compare_btw_arrays_w_size_2_and_3
+    public :: eqvLL_should_return_true_when_2_arrays_have_same_values
+    public :: eqvLL_should_return_false_when_2_arrays_have_diffelent_values
+    public :: eqvLL_should_return_false_when_2_arrays_have_different_shapes
 
 contains
-    subroutine eqvLL_parameterized_compare_size_2_arrays(error)
+    subroutine eqvLL_should_return_true_when_2_arrays_have_same_values(error)
         implicit none
         type(error_type), allocatable, intent(out) :: error
-            !! error handler
+        !! error handler
 
         type(test_parameter_type), allocatable :: params(:)
         type(test_results_type) :: results
 
         params = [ &
                    new_test_parameter(arguments="lhs(:)=true,true rhs(:)=true,true",     expected="is_equal=true") &
-                 , new_test_parameter(arguments="lhs(:)=true,true rhs(:)=false,true",    expected="is_equal=false") &
+                 , new_test_parameter(arguments="lhs(:)=false,true rhs(:)=false,true",   expected="is_equal=true") &
+                 , new_test_parameter(arguments="lhs(:)=true,false rhs(:)=true,false",   expected="is_equal=true") &
+                 , new_test_parameter(arguments="lhs(:)=false,false rhs(:)=false,false", expected="is_equal=true") &
+                 ] !&
+
+        call run_test_cases_l2l2(params, results)
+        call check(error, results%all_cases_successful(), results%get_summary_message())
+    end subroutine eqvLL_should_return_true_when_2_arrays_have_same_values
+
+    subroutine eqvLL_should_return_false_when_2_arrays_have_diffelent_values(error)
+        implicit none
+        type(error_type), allocatable, intent(out) :: error
+        !! error handler
+
+        type(test_parameter_type), allocatable :: params(:)
+        type(test_results_type) :: results
+
+        params = [ &
+                 new_test_parameter(arguments="lhs(:)=true,true rhs(:)=false,true",    expected="is_equal=false") &
                  , new_test_parameter(arguments="lhs(:)=true,true rhs(:)=true,false",    expected="is_equal=false") &
                  , new_test_parameter(arguments="lhs(:)=true,true rhs(:)=false,false",   expected="is_equal=false") &
                  , new_test_parameter(arguments="lhs(:)=false,true rhs(:)=true,true",    expected="is_equal=false") &
-                 , new_test_parameter(arguments="lhs(:)=false,true rhs(:)=false,true",   expected="is_equal=true") &
                  , new_test_parameter(arguments="lhs(:)=false,true rhs(:)=true,false",   expected="is_equal=false") &
                  , new_test_parameter(arguments="lhs(:)=false,true rhs(:)=false,false",  expected="is_equal=false") &
                  , new_test_parameter(arguments="lhs(:)=true,false rhs(:)=true,true",    expected="is_equal=false") &
                  , new_test_parameter(arguments="lhs(:)=true,false rhs(:)=false,true",   expected="is_equal=false") &
-                 , new_test_parameter(arguments="lhs(:)=true,false rhs(:)=true,false",   expected="is_equal=true") &
                  , new_test_parameter(arguments="lhs(:)=true,false rhs(:)=false,false",  expected="is_equal=false") &
                  , new_test_parameter(arguments="lhs(:)=false,false rhs(:)=true,true",   expected="is_equal=false") &
                  , new_test_parameter(arguments="lhs(:)=false,false rhs(:)=false,true",  expected="is_equal=false") &
                  , new_test_parameter(arguments="lhs(:)=false,false rhs(:)=true,false",  expected="is_equal=false") &
-                 , new_test_parameter(arguments="lhs(:)=false,false rhs(:)=false,false", expected="is_equal=true") &
                  ] !&
 
-        call run_test_cases(params, results)
+        call run_test_cases_l2l2(params, results)
         call check(error, results%all_cases_successful(), results%get_summary_message())
+    end subroutine eqvLL_should_return_false_when_2_arrays_have_diffelent_values
 
-    contains
-        subroutine run_test_cases(params, results)
-            implicit none
-            type(test_parameter_type), intent(in) :: params(:)
-            type(test_results_type), intent(inout) :: results
+    subroutine run_test_cases_l2l2(params, results)
+        implicit none
+        type(test_parameter_type), intent(in) :: params(:)
+        type(test_results_type), intent(inout) :: results
 
-            logical :: lhs(2), rhs(2), is_equal
-            namelist /arguments/ lhs, rhs
-            namelist /expected/ is_equal
+        logical :: lhs(2), rhs(2), is_equal
+        namelist /arguments/ lhs, rhs
+        namelist /expected/ is_equal
 
-            character(:), allocatable :: case_name
-            logical :: actual
-            integer(int32) :: case
+        character(:), allocatable :: case_name
+        logical :: actual
+        integer(int32) :: case
 
-            call results%construct(params)
+        call results%construct(params)
 
-            do case = 1, results%get_number_of_test_cases()
-                read (unit=params(case)%expected_namelist, nml=expected)
-                read (unit=params(case)%arguments_namelist, nml=arguments)
+        do case = 1, results%get_number_of_test_cases()
+            read (unit=params(case)%expected_namelist, nml=expected)
+            read (unit=params(case)%arguments_namelist, nml=arguments)
 
-                case_name = "eqv_logical_logical() should return "//params(case)%expected()// &
-                            " when compare "//params(case)%arguments()
+            case_name = "eqv_logical_logical() should return "//params(case)%expected()// &
+                        " when compare "//params(case)%arguments()
 
-                actual = (lhs == rhs)
+            actual = (lhs == rhs)
 
-                call results%check_test(case, (actual .eqv. is_equal), &
-                                        case_name//new_line(" ")// &
-                                        "    expected : "//to_string(is_equal)//new_line(" ")// &
-                                        "    actual   : "//to_string(actual))
-            end do
-        end subroutine run_test_cases
-    end subroutine eqvLL_parameterized_compare_size_2_arrays
+            call results%check_test(case, (actual .eqv. is_equal), &
+                                    case_name//new_line(" ")// &
+                                    "    expected : "//to_string(is_equal)//new_line(" ")// &
+                                    "    actual   : "//to_string(actual))
+        end do
+    end subroutine run_test_cases_l2l2
 
-    subroutine eqvLL_parameterized_compare_btw_arrays_w_size_2_and_3(error)
+    subroutine eqvLL_should_return_false_when_2_arrays_have_different_shapes(error)
         implicit none
         type(error_type), allocatable, intent(out) :: error
             !! error handler
@@ -149,5 +164,5 @@ contains
                                         "    actual   : "//to_string(actual))
             end do
         end subroutine run_test_cases
-    end subroutine eqvLL_parameterized_compare_btw_arrays_w_size_2_and_3
+    end subroutine eqvLL_should_return_false_when_2_arrays_have_different_shapes
 end module refactor_test_argumentsPresence_unitTests_eqvLogicalLogical
