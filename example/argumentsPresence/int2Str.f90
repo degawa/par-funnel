@@ -70,7 +70,7 @@ program main
         logical :: exp_less_digits
 
         type(arguments_presence_type) :: arg_pres
-        character(:), allocatable :: test_name
+        character(:), allocatable :: case_name
 
         integer(int32) :: case
 
@@ -83,7 +83,7 @@ program main
             ! reading procedure arguments
             read (unit=params(case)%arguments_namelist, nml=arguments)
 
-            test_name = "int_to_str() should return "//params(case)%expected()// &
+            case_name = "int_to_str() should return "//params(case)%expected()// &
                         " when input "//params(case)%arguments()
 
             ! consider optional attribute
@@ -102,17 +102,17 @@ program main
 
             if (.not. params(case)%presented("less_digits")) then
                 if (act_string == trim(exp_string)) then
-                    print *, "[PASSED]: "//test_name
+                    print *, "[PASSED]: "//case_name
                 else
-                    print *, "[FAILED]: "//test_name
+                    print *, "[FAILED]: "//case_name
                     print *, "    expected : ", exp_string
                     print *, "    actual   : ", act_string
                 end if
             else
                 if ((act_string == trim(exp_string)) .and. (less_digits .eqv. exp_less_digits)) then
-                    print *, "[PASSED]: "//test_name
+                    print *, "[PASSED]: "//case_name
                 else
-                    print *, "[FAILED]: "//test_name
+                    print *, "[FAILED]: "//case_name
                     print *, "    expected : ", exp_string, exp_less_digits
                     print *, "    actual   : ", act_string, less_digits
                 end if

@@ -56,7 +56,7 @@ contains
             logical :: exp_less_digits
 
             type(arguments_presence_type) :: arg_pres
-            character(:), allocatable :: test_name, message
+            character(:), allocatable :: case_name, message
 
             integer(int32) :: case
             logical :: cond
@@ -72,7 +72,7 @@ contains
                 ! procedure arguments
                 read (unit=params(case)%arguments_namelist, nml=arguments)
 
-                test_name = "int_to_str() should return "//params(case)%expected()// &
+                case_name = "int_to_str() should return "//params(case)%expected()// &
                             " when input "//params(case)%arguments()
 
                 ! consider optional attribute
@@ -92,12 +92,12 @@ contains
 
                 if (.not. params(case)%presented("less_digits")) then
                     cond = (act_string == trim(exp_string))
-                    message = test_name//new_line(" ")// &
+                    message = case_name//new_line(" ")// &
                               "    expected : "//trim(exp_string)//new_line(" ")// &
                               "    actual   : "//act_string
                 else
                     cond = (act_string == trim(exp_string)) .and. (less_digits .eqv. exp_less_digits)
-                    message = test_name//new_line(" ")// &
+                    message = case_name//new_line(" ")// &
                               "    expected : "//trim(exp_string)//", "//to_string(exp_less_digits)//new_line(" ")// &
                               "    actual   : "//act_string//", "//to_string(less_digits)
                 end if
