@@ -160,11 +160,11 @@ contains
             end block
 
             check_stat = results%get_success_statuses()
-            expected_message(1)%val = failure_message_if_test_is_successful
-            expected_message(3)%val = failure_message_if_test_is_successful
-            expected_message(5)%val = failure_message_if_test_is_successful
-            expected_message(7)%val = failure_message_if_test_is_successful
-            expected_message(9)%val = failure_message_if_test_is_successful
+            expected_message(1)%val = failure_message_if_test_case_is_successful
+            expected_message(3)%val = failure_message_if_test_case_is_successful
+            expected_message(5)%val = failure_message_if_test_case_is_successful
+            expected_message(7)%val = failure_message_if_test_case_is_successful
+            expected_message(9)%val = failure_message_if_test_case_is_successful
         end subroutine setup
         !
         subroutine teardown()

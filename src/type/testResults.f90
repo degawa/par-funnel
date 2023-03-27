@@ -4,7 +4,7 @@ module type_testResults
     private
 
     character(*), public, parameter :: &
-        failure_message_if_test_is_successful = "test passed"
+        failure_message_if_test_case_is_successful = "test passed"
 
     !>This private user-defined type contains
     !>the logical status of a test result
@@ -164,7 +164,7 @@ contains
             !! the failure message
 
         if (this%get_success_status_of(case)) then
-            message = failure_message_if_test_is_successful
+            message = failure_message_if_test_case_is_successful
         else
             message = this%test(case)%failure_message
         end if
