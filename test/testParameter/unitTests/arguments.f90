@@ -31,7 +31,7 @@ contains
                    "expected "//enclose(expected_arguments, '"')//", "// &
                    "but got "//enclose(actual_arguments, '"'))
 
-        call teardown()
+        call teardown(expected_arguments, actual_arguments)
     contains
         !
         subroutine setup(param, expected_arguments)
@@ -42,7 +42,12 @@ contains
             call param%construct("input1=1 input2=10 input3=4", "")
         end subroutine setup
         !
-        subroutine teardown()
+        subroutine teardown(expected_arguments, actual_arguments)
+            character(:), allocatable, intent(inout) :: expected_arguments
+            character(:), allocatable, intent(inout) :: actual_arguments
+
+            deallocate (expected_arguments)
+            deallocate (actual_arguments)
         end subroutine teardown
     end subroutine arguments_should_return_string_without_namelist_keywords
 end module test_testParameter_unitTests_arguments

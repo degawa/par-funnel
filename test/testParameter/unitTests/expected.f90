@@ -31,7 +31,7 @@ contains
                    "expected "//enclose(expected_expected, '"')//", "// &
                    "but got "//enclose(actual_expected, '"'))
 
-        call teardown()
+        call teardown(expected_expected, actual_expected)
     contains
         !
         subroutine setup(param, expected_expected)
@@ -42,7 +42,12 @@ contains
             call param%construct("", "output1=2 output2=20")
         end subroutine setup
         !
-        subroutine teardown()
+        subroutine teardown(expected_expected, actual_expected)
+            character(:), allocatable, intent(inout) :: expected_expected
+            character(:), allocatable, intent(inout) :: actual_expected
+
+            deallocate (expected_expected)
+            deallocate (actual_expected)
         end subroutine teardown
     end subroutine expected_should_return_string_without_namelist_keywords
 end module test_testParameter_unitTests_expected

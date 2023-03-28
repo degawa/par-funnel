@@ -44,7 +44,8 @@ contains
                    "expected "//enclose(expected_expected_namelist, '"')// &
                    ", but got "//enclose(param%expected_namelist, '"'))
 
-        call teardown()
+        call teardown(arguments, expected, &
+                      expected_arguments_namelist, expected_expected_namelist)
     contains
         !
         subroutine setup(param, arguments, expected, expected_arguments_namelist, expected_expected_namelist)
@@ -61,7 +62,14 @@ contains
             expected_expected_namelist = "&expected xyz=2 uvw=20 /"
         end subroutine setup
         !
-        subroutine teardown()
+        subroutine teardown(arguments, expected, expected_arguments_namelist, expected_expected_namelist)
+            character(:), allocatable, intent(inout) :: arguments, expected
+            character(:), allocatable, intent(inout) :: expected_arguments_namelist, expected_expected_namelist
+
+            deallocate (arguments)
+            deallocate (expected)
+            deallocate (expected_arguments_namelist)
+            deallocate (expected_expected_namelist)
         end subroutine teardown
     end subroutine newTestParam_should_return_instance_that_having_namelists
 end module test_testParameter_unitTests_newTestParameter

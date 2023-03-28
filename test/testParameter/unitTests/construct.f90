@@ -32,7 +32,7 @@ contains
                    "expected "//enclose(expected_arguments_namelist, '"')//", "// &
                    "but got "//enclose(param%arguments_namelist, '"'))
 
-        call teardown()
+        call teardown(arguments, expected, expected_arguments_namelist)
     contains
         !
         subroutine setup(arguments, expected, expected_arguments_namelist)
@@ -44,7 +44,13 @@ contains
             expected_arguments_namelist = "&arguments input1=1 input2=10 input3=4 /"
         end subroutine setup
         !
-        subroutine teardown()
+        subroutine teardown(arguments, expected, expected_arguments_namelist)
+            character(:), allocatable, intent(inout) :: arguments, expected
+            character(:), allocatable, intent(inout) :: expected_arguments_namelist
+
+            deallocate (arguments)
+            deallocate (expected)
+            deallocate (expected_arguments_namelist)
         end subroutine teardown
     end subroutine construct_should_configure_namelists_for_arguments
 
@@ -70,7 +76,7 @@ contains
                    "expected "//enclose(expected_expected_namelist, '"')//", "// &
                    "but got "//enclose(param%expected_namelist, '"'))
 
-        call teardown()
+        call teardown(arguments, expected, expected_expected_namelist)
     contains
         !
         subroutine setup(arguments, expected, expected_expected_namelist)
@@ -82,7 +88,13 @@ contains
             expected_expected_namelist = "&expected output1=2 output2=20 /"
         end subroutine setup
         !
-        subroutine teardown()
+        subroutine teardown(arguments, expected, expected_expected_namelist)
+            character(:), allocatable, intent(inout) :: arguments, expected
+            character(:), allocatable, intent(inout) :: expected_expected_namelist
+
+            deallocate (arguments)
+            deallocate (expected)
+            deallocate (expected_expected_namelist)
         end subroutine teardown
     end subroutine construct_should_configure_namelists_for_expected_results
 end module test_testParameter_unitTests_construct

@@ -55,7 +55,7 @@ contains
                 if (occurred(error)) return
             end if
         end do
-        call teardown()
+        call teardown(params, check_stat, expected_message, actual_message)
     contains
         !
         subroutine setup(num_param, params, results, check_stat, expected_message)
@@ -93,7 +93,16 @@ contains
             expected_message(8)%val = "case 8 failed"
         end subroutine setup
         !
-        subroutine teardown()
+        subroutine teardown(params, check_stat, expected_message, actual_message)
+            type(test_parameter_type), allocatable, intent(inout) :: params(:)
+            logical, allocatable, intent(inout) :: check_stat(:)
+            type(string_type), allocatable, intent(inout) :: expected_message(:)
+            character(:), allocatable, intent(inout) :: actual_message
+
+            deallocate (params)
+            deallocate (check_stat)
+            deallocate (expected_message)
+            deallocate (actual_message)
         end subroutine teardown
     end subroutine getFailureMsg_should_return_failure_msg_when_test_case_failed
 
@@ -128,7 +137,7 @@ contains
                 if (occurred(error)) return
             end if
         end do
-        call teardown()
+        call teardown(params, check_stat, expected_message, actual_message)
     contains
         !
         subroutine setup(num_param, params, results, check_stat, expected_message)
@@ -167,7 +176,16 @@ contains
             expected_message(9)%val = failure_message_if_test_case_is_successful
         end subroutine setup
         !
-        subroutine teardown()
+        subroutine teardown(params, check_stat, expected_message, actual_message)
+            type(test_parameter_type), allocatable, intent(inout) :: params(:)
+            logical, allocatable, intent(inout) :: check_stat(:)
+            type(string_type), allocatable, intent(inout) :: expected_message(:)
+            character(:), allocatable, intent(inout) :: actual_message
+
+            deallocate (params)
+            deallocate (check_stat)
+            deallocate (expected_message)
+            deallocate (actual_message)
         end subroutine teardown
     end subroutine getFailureMsg_should_return_msg_that_the_test_case_successful
 
@@ -195,7 +213,7 @@ contains
                    "expected "//expected_message// &
                    ", but got "//actual_message)
 
-        call teardown()
+        call teardown(params, expected_message, actual_message)
     contains
         !
         subroutine setup(num_param, params, results, expected_message)
@@ -232,7 +250,14 @@ contains
                                "case 9: case 9 failed"
         end subroutine setup
         !
-        subroutine teardown()
+        subroutine teardown(params, expected_message, actual_message)
+            type(test_parameter_type), allocatable, intent(inout) :: params(:)
+            character(:), allocatable, intent(inout) :: expected_message
+            character(:), allocatable, intent(inout) :: actual_message
+
+            deallocate (params)
+            deallocate (expected_message)
+            deallocate (actual_message)
         end subroutine teardown
     end subroutine getSummaryMsg_should_return_failure_msgs_of_failed_cases
 
@@ -261,7 +286,7 @@ contains
                    "expected "//expected_message// &
                    ", but got "//actual_message)
 
-        call teardown()
+        call teardown(params, expected_message, actual_message)
     contains
         !
         subroutine setup(num_param, params, results, input_message, expected_message)
@@ -299,7 +324,14 @@ contains
                                "case 10: case 10 failed"
         end subroutine setup
         !
-        subroutine teardown()
+        subroutine teardown(params, expected_message, actual_message)
+            type(test_parameter_type), allocatable, intent(inout) :: params(:)
+            character(:), allocatable, intent(inout) :: expected_message
+            character(:), allocatable, intent(inout) :: actual_message
+
+            deallocate (params)
+            deallocate (expected_message)
+            deallocate (actual_message)
         end subroutine teardown
     end subroutine appendFailureMsgs_should_append_failure_msg_to_the_end_of_arg
 end module test_testResults_unitTests_getMessage

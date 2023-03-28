@@ -47,7 +47,7 @@ contains
             end do
         end block
 
-        call teardown()
+        call teardown(key, expected, key_val, exp_val)
     contains
         !
         subroutine setup(param, key, expected)
@@ -60,7 +60,13 @@ contains
             expected = [string_type("")]
         end subroutine setup
         !
-        subroutine teardown()
+        subroutine teardown(key, expected, key_val, exp_val)
+            type(string_type), allocatable, intent(inout) :: key(:), expected(:)
+            character(:), allocatable, intent(inout) :: key_val, exp_val
+            deallocate (key)
+            deallocate (expected)
+            deallocate (key_val)
+            deallocate (exp_val)
         end subroutine teardown
     end subroutine getExpValOf_should_not_return_value_when_key_is_not_present
 
@@ -96,7 +102,7 @@ contains
             end do
         end block
 
-        call teardown()
+        call teardown(expected_int, key, key_val)
     contains
         !
         subroutine setup(param, key, expected_int)
@@ -111,7 +117,14 @@ contains
             expected_int = [value, output2, output1]
         end subroutine setup
         !
-        subroutine teardown()
+        subroutine teardown(expected_int, key, key_val)
+            integer(int32), allocatable, intent(inout) :: expected_int(:)
+            type(string_type), allocatable, intent(inout) :: key(:)
+            character(:), allocatable, intent(inout) :: key_val
+
+            deallocate (expected_int)
+            deallocate (key)
+            deallocate (key_val)
         end subroutine teardown
     end subroutine getExpValOf_should_return_value_described_in_namelist
 end module test_testParameter_unitTests_getExpectedValueOf

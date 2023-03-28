@@ -41,7 +41,7 @@ contains
             end do
         end block
 
-        call teardown()
+        call teardown(key, presented)
     contains
         !
         subroutine setup(param, key, presented)
@@ -54,7 +54,12 @@ contains
             presented = [.true., .true., .true., .true.]
         end subroutine setup
         !
-        subroutine teardown()
+        subroutine teardown(key, presented)
+            type(string_type), allocatable, intent(inout) :: key(:)
+            logical, allocatable, intent(inout) :: presented(:)
+
+            deallocate (key)
+            deallocate (presented)
         end subroutine teardown
     end subroutine presented_should_return_T_when_key_is_present_in_namelist
 
@@ -79,7 +84,7 @@ contains
             end do
         end block
 
-        call teardown()
+        call teardown(key, not_presented)
     contains
         !
         subroutine setup(param, key, not_presented)
@@ -92,7 +97,12 @@ contains
             not_presented = [.false., .false., .false., .false.]
         end subroutine setup
         !
-        subroutine teardown()
+        subroutine teardown(key, not_presented)
+            type(string_type), allocatable, intent(inout) :: key(:)
+            logical, allocatable, intent(inout) :: not_presented(:)
+
+            deallocate (key)
+            deallocate (not_presented)
         end subroutine teardown
     end subroutine presented_should_return_F_when_key_is_not_present_in_namelist
 end module test_testParameter_unitTests_presented

@@ -38,7 +38,7 @@ contains
             if (occurred(error)) return
         end do
 
-        call teardown()
+        call teardown(params, expected_status)
     contains
         !
         subroutine setup(num_param, params, results, expected_status)
@@ -64,7 +64,12 @@ contains
             end block
         end subroutine setup
         !
-        subroutine teardown()
+        subroutine teardown(params, expected_status)
+            type(test_parameter_type), allocatable, intent(inout) :: params(:)
+            logical, allocatable, intent(inout) :: expected_status(:)
+
+            deallocate (params)
+            deallocate (expected_status)
         end subroutine teardown
     end subroutine getSuccessStatusOf_should_return_T_if_test_case_is_successful
 
@@ -87,7 +92,7 @@ contains
                    "expected "//to_string(count(expected_status))//" cases success"// &
                    ", but got "//to_string(count(actual_status))//" cases success")
 
-        call teardown()
+        call teardown(params, expected_status, actual_status)
     contains
         !
         subroutine setup(num_param, params, results, expected_status)
@@ -113,7 +118,14 @@ contains
             end block
         end subroutine setup
         !
-        subroutine teardown()
+        subroutine teardown(params, expected_status, actual_status)
+            type(test_parameter_type), allocatable, intent(inout) :: params(:)
+            logical, allocatable, intent(inout) :: expected_status(:)
+            logical, allocatable, intent(inout) :: actual_status(:)
+
+            deallocate (params)
+            deallocate (expected_status)
+            deallocate (actual_status)
         end subroutine teardown
     end subroutine getSuccessStatuses_should_return_T_if_test_case_is_successful
 
@@ -136,7 +148,7 @@ contains
                    "expected "//to_string(count(.not. expected_status))//" cases success"// &
                    ", but got "//to_string(count(actual_status))//" cases success")
 
-        call teardown()
+        call teardown(params, expected_status, actual_status)
     contains
         !
         subroutine setup(num_param, params, results, expected_status)
@@ -162,7 +174,14 @@ contains
             end block
         end subroutine setup
         !
-        subroutine teardown()
+        subroutine teardown(params, expected_status, actual_status)
+            type(test_parameter_type), allocatable, intent(inout) :: params(:)
+            logical, allocatable, intent(inout) :: expected_status(:)
+            logical, allocatable, intent(inout) :: actual_status(:)
+
+            deallocate (params)
+            deallocate (expected_status)
+            deallocate (actual_status)
         end subroutine teardown
     end subroutine getFailureStatuses_should_return_T_if_test_case_failed
 
@@ -185,7 +204,7 @@ contains
                    "expected "//to_string(expected)//" cases failed"// &
                    ", but got "//to_string(actual)//" cases failed")
 
-        call teardown()
+        call teardown(params)
     contains
         !
         subroutine setup(num_param, params, results, expected)
@@ -214,7 +233,9 @@ contains
             end block
         end subroutine setup
         !
-        subroutine teardown()
+        subroutine teardown(params)
+            type(test_parameter_type), allocatable, intent(inout) :: params(:)
+            deallocate (params)
         end subroutine teardown
     end subroutine getNumOfFailedStat_should_return_num_of_failed_test_case
 
@@ -237,7 +258,7 @@ contains
                    "expected "//to_string(expected)// &
                    ", but got "//to_string(actual))
 
-        call teardown()
+        call teardown(params)
     contains
         !
         subroutine setup(num_param, params, results, expected)
@@ -265,7 +286,9 @@ contains
             expected = .true.
         end subroutine setup
         !
-        subroutine teardown()
+        subroutine teardown(params)
+            type(test_parameter_type), allocatable, intent(inout) :: params(:)
+            deallocate (params)
         end subroutine teardown
     end subroutine allCasesSuccessful_should_return_T_if_all_cases_successful
 
@@ -288,7 +311,7 @@ contains
                    "expected "//to_string(expected)// &
                    ", but got "//to_string(actual))
 
-        call teardown()
+        call teardown(params)
     contains
         !
         subroutine setup(num_param, params, results, expected)
@@ -317,7 +340,9 @@ contains
             expected = .false.
         end subroutine setup
         !
-        subroutine teardown()
+        subroutine teardown(params)
+            type(test_parameter_type), allocatable, intent(inout) :: params(:)
+            deallocate (params)
         end subroutine teardown
     end subroutine allCasesSuccessful_should_return_F_if_not_all_cases_successful
 end module test_testResults_unitTests_getStatus

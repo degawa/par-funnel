@@ -55,7 +55,7 @@ contains
             if (occurred(error)) return
         end do
 
-        call teardown()
+        call teardown(params, expected_status, expected_message, actual_message)
     contains
         !
         subroutine setup(num_param, params, results, expected_status, expected_message)
@@ -86,7 +86,16 @@ contains
             end block
         end subroutine setup
         !
-        subroutine teardown()
+        subroutine teardown(params, expected_status, expected_message, actual_message)
+            type(test_parameter_type), allocatable, intent(inout) :: params(:)
+            logical, allocatable, intent(inout) :: expected_status(:)
+            type(string_type), allocatable, intent(inout) :: expected_message(:)
+            character(:), allocatable, intent(inout) :: actual_message
+
+            deallocate (params)
+            deallocate (expected_status)
+            deallocate (expected_message)
+            deallocate (actual_message)
         end subroutine teardown
     end subroutine checkTest_should_assign_test_status_and_message
 end module test_testResults_unitTests_checkTest

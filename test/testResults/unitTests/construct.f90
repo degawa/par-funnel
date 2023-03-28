@@ -28,7 +28,7 @@ contains
                    "expected "//to_string(expected_num_test)// &
                    ", but got "//to_string(actual))
 
-        call teardown
+        call teardown(params)
     contains
         !
         subroutine setup(num_param, params, expected)
@@ -40,7 +40,9 @@ contains
             expected = size(params)
         end subroutine setup
         !
-        subroutine teardown()
+        subroutine teardown(params)
+            type(test_parameter_type), allocatable, intent(inout) :: params(:)
+            deallocate (params)
         end subroutine teardown
     end subroutine construct_should_allocate_test_equal_to_num_params
 end module test_testResults_unitTests_construct
