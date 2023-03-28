@@ -15,6 +15,8 @@ module type_testParameter
     contains
         procedure, public, pass :: construct => construct_component_namelists
         !* constructs the `test_parameter_type` instance
+        final :: finalize
+        !* finalizes the `test_parameter_type` instance
 
         procedure, public, pass :: presented
         !* checks for the presence of an argument
@@ -71,6 +73,17 @@ contains
         this%arguments_namelist = namelist_start//arguments_group_name//" "//arguments//" "//namelist_end
         this%expected_namelist = namelist_start//expected_group_name//" "//expected//" "//namelist_end
     end subroutine construct_component_namelists
+
+    !>finalize the `test_parameter_type` instance
+    !>by deallocating components
+    !>expected_namelist` and `expected_namelist`
+    pure subroutine finalize(this)
+        implicit none
+        type(test_parameter_type), intent(inout) :: this
+            !! passed dummy argument
+        if (allocated(this%arguments_namelist)) deallocate (this%arguments_namelist)
+        if (allocated(this%expected_namelist)) deallocate (this%expected_namelist)
+    end subroutine finalize
 
     !>returns `.true.` if the `argument` is found
     !>in the component `arguments_namelist`

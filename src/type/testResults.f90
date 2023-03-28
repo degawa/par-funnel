@@ -21,6 +21,9 @@ module type_testResults
         character(:), private, allocatable :: failure_message
             !! a failure message.
             !! not allocated if test case is successful or not checked.
+    contains
+        final :: finalize_test_case_result
+        !* finalize the `test_case_result_type` instance
     end type test_case_result_type
 
     !>This user-defined type contains test case results.
@@ -39,6 +42,8 @@ module type_testResults
     contains
         procedure, public, pass :: construct
         !* constructs the `test_results_type` instance
+        final :: finalize
+        !* finalize the `test_results_type` instance
 
         procedure, public, pass :: check_test
         !* checks the result of the conditional formula in a test case
@@ -78,6 +83,15 @@ contains
 
         allocate (this%test(size(test_parameters)))
     end subroutine construct
+
+    !>finalizes the `test_results_type` instance
+    !>by deallocating the `test` component.
+    pure subroutine finalize(this)
+        implicit none
+        type(test_results_type), intent(inout) :: this
+            !! passed dummy argument
+        if (allocated(this%test)) deallocate (this%test)
+    end subroutine finalize
 
     !>checks the result for the conditional formula of a test case
     !>and stores it to an element of the `test_result_type` collection.
@@ -218,6 +232,16 @@ contains
         message = to_string(this%get_number_of_failed_cases())//" test case(s) failed"
         call this%append_failure_messages_to(message)
     end function get_summary_message
+
+    !------------------------------------------------------------------!
+    !>constructs the `test_case_result_type` instance
+    !>by deallocating the `failure_message` component.
+    pure subroutine finalize_test_case_result(this)
+        implicit none
+        type(test_case_result_type), intent(inout) :: this
+            !! passed dummy argument
+        if (allocated(this%failure_message)) deallocate (this%failure_message)
+    end subroutine finalize_test_case_result
 
     !------------------------------------------------------------------!
     !>returns the string converted from the integer.

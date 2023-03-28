@@ -16,6 +16,8 @@ module type_argumentsPresence
     contains
         procedure, public, pass :: construct
         !* constructs the `arguments_presence_type` instance
+        final :: finalize
+        !* finalizes the `arguments_presence_type` instance
 
         procedure, public, pass :: eqv_type
         !* gets the equality between a `arguments_presence_type` and a `arguments_presence_type`
@@ -68,6 +70,15 @@ contains
 
         allocate (this%presented, source=presented)
     end subroutine construct
+
+    !>finalize the `arguments_presence_type` instance
+    !>by deallocating `presented` component.
+    pure subroutine finalize(this)
+        implicit none
+        type(arguments_presence_type), intent(inout) :: this
+            !! passed dummy argument
+        if (allocated(this%presented)) deallocate (this%presented)
+    end subroutine finalize
 
     !>returns `.true.` if all the values of component `presented`
     !>are equivalent and `.false.` otherwise.
