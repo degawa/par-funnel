@@ -20,6 +20,7 @@ module test_testResults_unitTests_getMessage
     private
     public :: getFailureMsg_should_return_failure_msg_when_test_case_failed
     public :: getFailureMsg_should_return_msg_that_the_test_case_successful
+    public :: getFailureMsg_should_return_msg_that_the_test_case_not_checked
     public :: getSummaryMsg_should_return_failure_msgs_of_failed_cases
     public :: appendFailureMsgs_should_append_failure_msg_to_the_end_of_arg
 
@@ -188,6 +189,51 @@ contains
             deallocate (actual_message)
         end subroutine teardown
     end subroutine getFailureMsg_should_return_msg_that_the_test_case_successful
+
+    subroutine getFailureMsg_should_return_msg_that_the_test_case_not_checked(error)
+        implicit none
+        type(error_type), allocatable, intent(out) :: error
+        !! error handler
+
+        type(test_parameter_type) :: params
+        type(test_results_type) :: results
+        character(:), allocatable :: expected_message
+
+        character(:), allocatable :: actual_message
+
+        call setup(params, results, expected_message)
+
+        actual_message = results%get_failure_message_of(1)
+
+        call check(error, len(actual_message) == len(expected_message), &
+                   "expected "//to_string(len(expected_message))// &
+                   ", but got "//to_string(len(actual_message)))
+        if (occurred(error)) return
+
+        call check(error, actual_message == expected_message, &
+                   "expected "//expected_message// &
+                   ", but got "//actual_message)
+        if (occurred(error)) return
+        call teardown(expected_message, actual_message)
+    contains
+        !
+        subroutine setup(params, results, expected_message)
+            type(test_parameter_type), intent(out) :: params
+            type(test_results_type), intent(out) :: results
+            character(:), allocatable, intent(out) :: expected_message
+
+            call results%construct([params])
+            expected_message = failure_message_if_test_case_is_not_be_checked
+        end subroutine setup
+        !
+        subroutine teardown(expected_message, actual_message)
+            character(:), allocatable, intent(inout) :: expected_message
+            character(:), allocatable, intent(inout) :: actual_message
+
+            deallocate (expected_message)
+            deallocate (actual_message)
+        end subroutine teardown
+    end subroutine getFailureMsg_should_return_msg_that_the_test_case_not_checked
 
     subroutine getSummaryMsg_should_return_failure_msgs_of_failed_cases(error)
         implicit none

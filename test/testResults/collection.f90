@@ -43,6 +43,9 @@ contains
                      , new_unittest("get_failure_message(), "// &
                                     "it should return message indicating that the test case is successful", &
                                     getFailureMsg_should_return_msg_that_the_test_case_successful) &
+                     , new_unittest("get_failure_message(), "// &
+                                    "it should return message indicating that the test case is not checked", &
+                                    getFailureMsg_should_return_msg_that_the_test_case_not_checked) &
                      , new_unittest("get_summary_message(), "// &
                                     "it should return concatenated failure message of the failed test cases", &
                                     getSummaryMsg_should_return_failure_msgs_of_failed_cases) &

@@ -6,6 +6,9 @@ module type_testResults
     character(*), public, parameter :: &
         failure_message_if_test_case_is_successful = "test passed"
 
+    character(*), public, parameter :: &
+        failure_message_if_test_case_is_not_be_checked = "An uncaught error occurred"
+
     !>This private user-defined type contains
     !>the logical status of a test result
     !>and a message when the test fails,
@@ -166,7 +169,11 @@ contains
         if (this%get_success_status_of(case)) then
             message = failure_message_if_test_case_is_successful
         else
-            message = this%test(case)%failure_message
+            if (allocated(this%test(case)%failure_message)) then
+                message = this%test(case)%failure_message
+            else
+                message = failure_message_if_test_case_is_not_be_checked
+            end if
         end if
     end function get_failure_message_of
 
