@@ -14,16 +14,16 @@ module type_testResults
     !>and a message when the test fails,
     !>and the intended use is to compose the type of collection
     !>that stores the results of test cases.
-    type, private :: test_result_type
-        logical, private :: success_status
-            !! a status of a test result.
-            !! `.true.` if the test is successful.
+    type, private :: test_case_result_type
+        logical, private :: success_status = .false.
+            !! a status of a test case result.
+            !! `.true.` if the test case is successful.
         character(:), private, allocatable :: failure_message
             !! a failure message.
-            !! not allocated if test is successful.
-    end type test_result_type
+            !! not allocated if test case is successful or not checked.
+    end type test_case_result_type
 
-    !>This user-defined type contains test results.
+    !>This user-defined type contains test case results.
     !>
     !>@note
     !>This type has an array as the component
@@ -34,7 +34,7 @@ module type_testResults
     !>and gather the results of all tests.
     !>@endnote
     type, public :: test_results_type
-        type(test_result_type), private, allocatable :: test(:)
+        type(test_case_result_type), private, allocatable :: test(:)
             !! results of test case
     contains
         procedure, public, pass :: construct
