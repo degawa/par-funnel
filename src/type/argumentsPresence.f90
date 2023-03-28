@@ -49,9 +49,9 @@ module type_argumentsPresence
 
 contains
     !>returns a new `arguments_presence_type` instance.
-    function construct_arguments_presence_type(presented) result(new_present_arguments)
+    pure function construct_arguments_presence_type(presented) result(new_present_arguments)
         implicit none
-        logical :: presented(:)
+        logical, intent(in) :: presented(:)
             !! presence status of optional arguments written in a namelist
         type(arguments_presence_type) :: new_present_arguments
             !! new `arguments_presence_type` instance
@@ -61,11 +61,11 @@ contains
 
     !>constructs the `arguments_presence_type` instance
     !>based on the presence statuses of optional arguments in the namelist
-    subroutine construct(this, presented)
+    pure subroutine construct(this, presented)
         implicit none
         class(arguments_presence_type), intent(inout) :: this
             !! passed dummy argument
-        logical :: presented(:)
+        logical, intent(in) :: presented(:)
             !! presence statuses of optional arguments
 
         allocate (this%presented, source=presented)
