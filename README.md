@@ -32,7 +32,7 @@ Due to the use of relatively new features, including object-oriented programming
     - NAG Fortran 7.1 Build 7117
 - [Fortran Package Manager](https://github.com/fortran-lang/fpm) (fpm) 0.7.0 alpha
     - Par-funnel is created as an fpm project.
-- [test-drive](https://github.com/fortran-lang/test-drive)] 0.4.0
+- [test-drive](https://github.com/fortran-lang/test-drive) 0.4.0
     - Par-funnel provide an example of a collaboration with test-drive.
 - [FORD](https://github.com/Fortran-FOSS-Programmers/ford) (optional)
 
