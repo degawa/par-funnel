@@ -43,21 +43,21 @@ program main
             actual = doublify(input)
 
             if (actual == expect) then
-                print *, "[PASSED]: doublify() should return "//params(case)%get_expected_value_of("output")// &
-                    " when input "//params(case)%get_argument_value_of("input")
+                print *, "[PASSED]: doublify() should return "//params(case)%expected()// &
+                    " when input "//params(case)%arguments()
             else
-                print *, "[FAILED]: doublify() should return "//params(case)%get_expected_value_of("output")// &
-                    " when input "//params(case)%get_argument_value_of("input")
+                print *, "[FAILED]: doublify() should return "//params(case)%expected()// &
+                    " when input "//params(case)%arguments()
                 print *, "          expected : ", expect
                 print *, "          actual   : ", actual
             end if
         end do
         !|### Execution result
         !```console
-        ![FAILED]: doublify() should return 2 when input 1
+        ![FAILED]: doublify() should return output=2 when input input=1
         !          expected :            2
         !          actual   :            3
-        ![PASSED]: doublify() should return 4 when input 2
+        ![PASSED]: doublify() should return output=4 when input input=2
         !```
     end block
 end program main

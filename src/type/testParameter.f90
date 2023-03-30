@@ -21,9 +21,6 @@ module type_testParameter
 
         procedure, public, pass :: presented
         !* checks for the presence of an argument
-        procedure, public, pass :: get_argument_value_of
-        !* gets the value of an argument
-        procedure, public, pass :: get_expected_value_of
         !* gets the value of an expected result
         procedure, public, pass :: arguments
         !* gets the arguments
@@ -93,41 +90,6 @@ contains
 
         presented = (index(this%arguments_namelist, " "//argument//"=") > 0)
     end function presented
-
-    !>returns the key's value retrieved from `"key=val"` format
-    !>written in the component `arguments`.
-    pure function get_argument_value_of(this, argument) result(val)
-        implicit none
-        class(test_parameter_type), intent(in) :: this
-            !! passed dummy argument
-        character(*), intent(in) :: argument
-            !! the key of argument to find in the namelist of arguments
-        character(:), allocatable :: val
-            !! the value of the argument
-
-        if (.not. this%presented(argument)) then
-            val = ""
-            return
-        end if
-
-        val = get_value_of(argument, this%arguments_namelist)
-    end function get_argument_value_of
-
-    !>returns the key's value retrieved from `"key=val"` format
-    !>written in the component `expected`.
-    pure function get_expected_value_of(this, expected) result(val)
-        implicit none
-        class(test_parameter_type), intent(in) :: this
-            !! passed dummy argument
-        character(*), intent(in) :: expected
-            !! the key of expected result to find in the namelist of expected
-        character(:), allocatable :: val
-            !! the value of the expected result
-
-        ! this%presented() cannot detect `expected` key
-        ! that is not contained in expected_namelist
-        val = get_value_of(expected, this%expected_namelist)
-    end function get_expected_value_of
 
     !>returns the arguments in a string,
     !>not including the namelist keywords
