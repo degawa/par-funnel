@@ -35,16 +35,20 @@ contains
         character(:), allocatable :: replaced
             !! new string
 
+        character(:), allocatable :: remains
         integer(int32) :: len_it, len_with, idx_it
         len_it = len(it)
         len_with = len(with)
 
-        replaced = string
+        replaced = ""
+        remains = string
 
-        idx_it = index(replaced, it, back=.false.)
+        idx_it = index(remains, it, back=.false.)
         do while (idx_it > 0)
-            replaced = replaced(1:idx_it - 1)//with//replaced(idx_it + len_it:)
-            idx_it = index(replaced, it, back=.false.)
+            replaced = replaced//remains(:idx_it - 1)//with
+            remains = remains(idx_it + len_it:)
+            idx_it = index(remains, it, back=.false.)
         end do
+        replaced = replaced//remains
     end function replace_all
 end module nml_util_replace
