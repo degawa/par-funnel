@@ -17,6 +17,18 @@ contains
                      new_unittest("new_parameterization_spec(), "// &
                                   "it should return a 'arguments_presence_type' instance.", &
                                   newParaSpec_should_return_parameterization_spec_type_instance) &
+                     , new_unittest("new_parameterization_spec(), "// &
+                                    "it should replace new-line in arguments and expected namelists with new-line mark"// &
+                                    " if `replace_new_line=.true.`.", &
+                                    newParaSpec_should_replace_new_line_if_replace_new_line_T) &
+                     , new_unittest("new_parameterization_spec(), "// &
+                                    "it should not replace new-line in arguments and expected namelists with new-line mark"// &
+                                    " if `replace_new_line=.false.`.", &
+                                    newParaSpec_should_not_replace_new_line_if_replace_new_line_F) &
+                     , new_unittest("new_parameterization_spec(), "// &
+                                    "it should not replace new-line in arguments and expected namelists with new-line mark"// &
+                                    " if `replace_new_line` not present.", &
+                                    newParaSpec_should_not_replace_new_line_if_arg_not_present) &
                      , new_unittest("get_number_of_test_cases(), "// &
                                     "it should return 1 when the instance managed 1 test parameter.", &
                                     getNumTestCases_should_return_1_when_manage_1_test_parameter) &

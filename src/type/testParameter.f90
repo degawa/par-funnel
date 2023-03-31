@@ -1,9 +1,12 @@
 module type_testParameter
     use, intrinsic :: iso_fortran_env
     use :: nml_util_format
+    use :: nml_util_replace
     implicit none
     private
     public :: new_test_parameter
+    public :: replace_new_line_mark
+    public :: replace_new_line_char
 
     !>This user-defined type contains procedure arguments
     !>and expected values that the procedure should return,

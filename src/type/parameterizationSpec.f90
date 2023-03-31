@@ -40,21 +40,26 @@ module type_parameterizationSpec
     end interface
 contains
     !>returns a new `parameterization_spec_type` instance.
-    pure function construct_parameterization_spec_type(parameter_cases, optional_args) result(new_spec)
+    pure function construct_parameterization_spec_type(parameter_cases, &
+                                                       optional_args, &
+                                                       replace_new_line) result(new_spec)
         implicit none
         type(test_parameter_type), intent(in) :: parameter_cases(:)
             !! list of test parameters
         type(argument_type), intent(in), optional :: optional_args(:)
             !! list of arguments name having the optional attribute
+        logical, intent(in), optional :: replace_new_line
+            !! if `.true.`, replace new-line char (`new_line()`) in namelists
+            !! with new-line mark ("\n")
         type(parameterization_spec_type) :: new_spec
             !! new `parameterization_spec_type` instance
 
-        call new_spec%construct(parameter_cases, optional_args)
+        call new_spec%construct(parameter_cases, optional_args, replace_new_line)
     end function construct_parameterization_spec_type
 
     !>constructs the `parameterization_spec_type` instance
     !>based on lists of test parameters and the optioanl arguments.
-    pure subroutine construct(this, parameter_cases, optional_args)
+    pure subroutine construct(this, parameter_cases, optional_args, replace_new_line)
         implicit none
         class(parameterization_spec_type), intent(inout) :: this
             !! passed dummy argument
@@ -62,8 +67,25 @@ contains
             !! list of test parameters
         type(argument_type), intent(in), optional :: optional_args(:)
             !! list of arguments name having the optional attribute
+        logical, intent(in), optional :: replace_new_line
+            !! if `.true.`, replace new-line char (`new_line()`) in namelists
+            !! with new-line mark ("\n")
 
         this%test_parameters = parameter_cases
+
+        if (present(replace_new_line)) then
+            if (replace_new_line) then
+                block
+                    integer(int32) :: case
+                    do case = 1, this%get_number_of_test_cases()
+                        this%test_parameters(case)%arguments_namelist &
+                            = replace_new_line_char(this%test_parameters(case)%arguments_namelist)
+                        this%test_parameters(case)%expected_namelist &
+                            = replace_new_line_char(this%test_parameters(case)%expected_namelist)
+                    end do
+                end block
+            end if
+        end if
 
         if (present(optional_args)) &
             this%optional_args = optional_args
