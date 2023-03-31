@@ -33,10 +33,12 @@ contains
                  , new_test_parameter(arguments="input=1000 fmt='(I2)' less_digits=false", &
                                       expected="string='**' less_digits=true") &
                  ]
+        call results%construct(params)
 
         call run_test_cases(params, results)
-
         call check(error, results%all_cases_successful(), results%get_summary_message())
+
+        call results%destruct()
     contains
         subroutine run_test_cases(params, results)
             implicit none
@@ -60,8 +62,6 @@ contains
 
             integer(int32) :: case
             logical :: cond
-
-            call results%construct(params)
 
             do case = 1, results%get_number_of_test_cases()
                 ! expected results
