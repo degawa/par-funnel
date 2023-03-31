@@ -19,6 +19,9 @@ module type_argumentsPresence
         final :: finalize
         !* finalizes the `arguments_presence_type` instance
 
+        procedure, public, pass :: get_number_of_presence_statuses
+        !* gets the number of statuses.
+
         procedure, public, pass :: eqv_type
         !* gets the equality between a `arguments_presence_type` and a `arguments_presence_type`
         procedure, public, pass :: eqv_logical
@@ -79,6 +82,21 @@ contains
             !! passed dummy argument
         if (allocated(this%presented)) deallocate (this%presented)
     end subroutine finalize
+
+    !>returns the number of presence statuses managed by the instance.
+    pure function get_number_of_presence_statuses(this) result(num)
+        implicit none
+        class(arguments_presence_type), intent(in) :: this
+            !! passed dummy argument
+        integer(int32) :: num
+            !! the number of statuses
+
+        if (allocated(this%presented)) then
+            num = size(this%presented)
+        else
+            num = 0
+        end if
+    end function get_number_of_presence_statuses
 
     !>returns `.true.` if all the values of component `presented`
     !>are equivalent and `.false.` otherwise.
