@@ -16,9 +16,12 @@ contains
             !! collection of tests
 
         test_suite = [ &
-                     new_unittest("construct(), "// &
+                     new_unittest("construct_params(), "// &
                                   "it should allocate the component test equal to the number of test parameters", &
-                                  construct_should_allocate_test_equal_to_num_params) &
+                                  constructParams_should_allocate_test_equal_to_num_params) &
+                     , new_unittest("construct_spec(), "// &
+                                    "it should allocate the component test equal to the number of test parameters", &
+                                    constructSpec_should_allocate_test_equal_to_num_params) &
                      , new_unittest("get_success_status_of(), "// &
                                     "it should return true if test case is successful", &
                                     getSuccessStatusOf_should_return_T_if_test_case_is_successful) &
