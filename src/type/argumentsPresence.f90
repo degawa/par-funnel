@@ -5,6 +5,7 @@ module type_argumentsPresence
     public :: arguments_presence
     public :: operator(.has.)
     public :: operator(==)
+    public :: to_string
 
     !>This user-defined type contains the presence status of arguments
     !>in the arguments namelist,
@@ -21,6 +22,9 @@ module type_argumentsPresence
 
         procedure, public, pass :: get_number_of_presence_statuses
         !* gets the number of statuses.
+
+        procedure, public, pass :: as_string
+        !* gets the presentce statuses in a string
 
         procedure, public, pass :: eqv_type
         !* gets the equality between a `arguments_presence_type` and a `arguments_presence_type`
@@ -48,6 +52,10 @@ module type_argumentsPresence
     !>@note to work with ifort, `generic :: operator(.has.)=>eqv_logical` is not used.
     interface operator(.has.)
         procedure :: eqv_logical
+    end interface
+
+    interface to_string
+        procedure :: to_string_arg_pres
     end interface
 
 contains
@@ -97,6 +105,32 @@ contains
             num = 0
         end if
     end function get_number_of_presence_statuses
+
+    !>returns the arguments presence statuses in string.
+    !>For example,
+    !>
+    !>- `"[ T T F ]"` when an `arguments_presence_type` instance has [.true. .true. .false.]
+    !>- `"[ ]"` when an `arguments_presence_type` instance is not initialized
+    !>
+    pure function as_string(this) result(str)
+        implicit none
+        class(arguments_presence_type), intent(in) :: this
+            !! passed dummy argument
+        character(:), allocatable :: str
+            !! presence statues in string
+
+        integer(int32) :: arg
+
+        str = "["
+        do arg = 1, this%get_number_of_presence_statuses()
+            if (this%presented(arg)) then
+                str = str//" T"
+            else
+                str = str//" F"
+            end if
+        end do
+        str = str//" ]"
+    end function as_string
 
     !>returns `.true.` if all the values of component `presented`
     !>are equivalent and `.false.` otherwise.
@@ -178,4 +212,14 @@ contains
 
         are_different_shape = any(shape(a) /= shape(b))
     end function are_different_shape
+
+    !------------------------------------------------------------------!
+    pure function to_string_arg_pres(x) result(str)
+        implicit none
+        type(arguments_presence_type), intent(in) :: x
+            !! `arguments_presence_type` instance
+        character(:), allocatable :: str
+
+        str = x%as_string()
+    end function to_string_arg_pres
 end module type_argumentsPresence

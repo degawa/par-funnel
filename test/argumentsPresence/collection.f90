@@ -6,6 +6,7 @@ module test_argumentsPresence_collection
     use :: test_argumentsPresence_unitTests_eqvLogicalType
     use :: test_argumentsPresence_unitTests_newArgumentsPresence
     use :: test_argumentsPresence_unitTests_get
+    use :: test_argumentsPresence_unitTests_asString
     implicit none
     private
     public :: collect_argumentsPresence
@@ -20,6 +21,8 @@ contains
         type(unittest_type), allocatable :: test_suite_tl(:)
         type(unittest_type), allocatable :: test_suite_tt(:)
         type(unittest_type), allocatable :: test_suite_lt(:)
+        type(unittest_type), allocatable :: test_suite_get(:)
+        type(unittest_type), allocatable :: test_suite_asStr(:)
 
         test_suite_ll = [ &
                         new_unittest("eqv_logical_logical(), it should return true "// &
@@ -153,6 +156,33 @@ contains
                                        eqvTT_should_return_T_when_compare_zero_size_statuses) &
                         ]
 
+        test_suite_get = [ &
+                         new_unittest("get_number_of_presence_statuses(), "// &
+                                      "it should return 1 when the instance managed 1 argument presence status.", &
+                                      getNumPresStat_should_return_1_when_manage_1_presence_status) &
+                         , new_unittest("get_number_of_presence_statuses(), "// &
+                                        "it should return 3 when the instance managed 3 argument presence status.", &
+                                        getNumPresStat_should_return_3_when_manage_3_presence_status) &
+                         , new_unittest("get_number_of_presence_statuses(), "// &
+                                        "it should return 0 when the instance is not initialized.", &
+                                        getNumPresStat_should_return_0_when_instance_is_not_initialized) &
+                         ]
+
+        test_suite_asStr = [ &
+                           new_unittest("as_string(), "// &
+                                        "it should return [ T F T ] when the instance has [.true., .false., .true.].", &
+                                        asString_should_return_TFT_when_arg_pres_has_TFT) &
+                           , new_unittest("as_string(), "// &
+                                          "it should return [ ] when the instance is not intialized.", &
+                                          asString_should_return_blank_when_arg_pres_is_not_initialized) &
+                           , new_unittest("to_string(), "// &
+                                          "it should return [ F T F ] when the instance has [.false., .true., .false.].", &
+                                          toString_should_return_FTF_when_arg_pres_has_FTF) &
+                           , new_unittest("to_string(), "// &
+                                          "it should return [ ] when the instance is not intialized.", &
+                                          toString_should_return_blank_when_arg_pres_is_not_initialized) &
+                           ]
+
         test_suite = [test_suite_ll, test_suite_tl, test_suite_lt, test_suite_tt &
                       , new_unittest("argumets_presence(), "// &
                                      "it should return a 'arguments_presence_type' instance.", &
@@ -160,15 +190,7 @@ contains
                       , new_unittest("argumets_presence(), "// &
                                      "it should return a 'arguments_presence_type' instance having presence statuses.", &
                                      argsPres_should_return_instance_that_having_presence_status) &
-                      , new_unittest("get_number_of_presence_statuses(), "// &
-                                     "it should return 1 when the instance managed 1 argument presence status.", &
-                                     getNumPresStat_should_return_1_when_manage_1_presence_status) &
-                      , new_unittest("get_number_of_presence_statuses(), "// &
-                                     "it should return 3 when the instance managed 3 argument presence status.", &
-                                     getNumPresStat_should_return_3_when_manage_3_presence_status) &
-                      , new_unittest("get_number_of_presence_statuses(), "// &
-                                     "it should return 0 when the instance is not initialized.", &
-                                     getNumPresStat_should_return_0_when_instance_is_not_initialized) &
+                      , test_suite_get, test_suite_asStr &
                       ]
     end subroutine collect_argumentsPresence
 end module test_argumentsPresence_collection
