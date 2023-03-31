@@ -5,6 +5,7 @@ module test_argumentsPresence_collection
     use :: test_argumentsPresence_unitTests_eqvType
     use :: test_argumentsPresence_unitTests_eqvLogicalType
     use :: test_argumentsPresence_unitTests_newArgumentsPresence
+    use :: test_argumentsPresence_unitTests_get
     implicit none
     private
     public :: collect_argumentsPresence
@@ -159,6 +160,15 @@ contains
                       , new_unittest("argumets_presence(), "// &
                                      "it should return a 'arguments_presence_type' instance having presence statuses.", &
                                      argsPres_should_return_instance_that_having_presence_status) &
+                      , new_unittest("get_number_of_presence_statuses(), "// &
+                                     "it should return 1 when the instance managed 1 argument presence status.", &
+                                     getNumPresStat_should_return_1_when_manage_1_presence_status) &
+                      , new_unittest("get_number_of_presence_statuses(), "// &
+                                     "it should return 3 when the instance managed 3 argument presence status.", &
+                                     getNumPresStat_should_return_3_when_manage_3_presence_status) &
+                      , new_unittest("get_number_of_presence_statuses(), "// &
+                                     "it should return 0 when the instance is not initialized.", &
+                                     getNumPresStat_should_return_0_when_instance_is_not_initialized) &
                       ]
     end subroutine collect_argumentsPresence
 end module test_argumentsPresence_collection
