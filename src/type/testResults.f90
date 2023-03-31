@@ -44,6 +44,8 @@ module type_testResults
         !* constructs the `test_results_type` instance
         procedure, public, pass :: construct_spec
         !* constructs the `test_results_type` instance
+        procedure, public, pass :: destruct
+        !* destructs the `test_results_type` instance
         final :: finalize
         !* finalize the `test_results_type` instance
         generic :: construct => construct_params, construct_spec
@@ -102,13 +104,21 @@ contains
         allocate (this%test(test_parameters%get_number_of_test_cases()))
     end subroutine construct_spec
 
-    !>finalizes the `test_results_type` instance
+    !>destructs the `test_results_type` instance
     !>by deallocating the `test` component.
+    pure subroutine destruct(this)
+        implicit none
+        class(test_results_type), intent(inout) :: this
+            !! passed dummy argument
+        if (allocated(this%test)) deallocate (this%test)
+    end subroutine destruct
+
+    !>finalizes the `test_results_type` instance.
     pure subroutine finalize(this)
         implicit none
         type(test_results_type), intent(inout) :: this
             !! passed dummy argument
-        if (allocated(this%test)) deallocate (this%test)
+        call this%destruct()
     end subroutine finalize
 
     !>checks the result for the conditional formula of a test case

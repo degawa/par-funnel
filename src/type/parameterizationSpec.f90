@@ -20,8 +20,10 @@ module type_parameterizationSpec
     contains
         procedure, public, pass :: construct
         !* constructs the `parameterization_spec_type` instance
+        procedure, public, pass :: destruct
+        !* destructs the `parameterization_spec_type` instance
         final :: finalize
-        !* fializes the `parameterization_spec_type` instance
+        !* finalizes the `parameterization_spec_type` instance
 
         procedure, public, pass :: get_number_of_test_cases
         !* gets the number of test cases
@@ -67,14 +69,23 @@ contains
             this%optional_args = optional_args
     end subroutine construct
 
+    !>constructs the `parameterization_spec_type` instance
+    !>based on lists of test parameters and the optioanl arguments.
+    pure subroutine destruct(this)
+        implicit none
+        class(parameterization_spec_type), intent(inout) :: this
+            !! passed dummy argument
+        if (allocated(this%test_parameters)) deallocate (this%test_parameters)
+        if (allocated(this%optional_args)) deallocate (this%optional_args)
+    end subroutine destruct
+
     !>finalize the `parameterization_spec_type` instance
     !>by deallocating `test_parameters` and `optional_args`.
     pure subroutine finalize(this)
         implicit none
         type(parameterization_spec_type), intent(inout) :: this
             !! passed dummy argument
-        if (allocated(this%test_parameters)) deallocate (this%test_parameters)
-        if (allocated(this%optional_args)) deallocate (this%optional_args)
+        call this%destruct()
     end subroutine finalize
 
     !>returns the number of test cases.
