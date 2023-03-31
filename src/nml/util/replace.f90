@@ -3,6 +3,7 @@ module nml_util_replace
     implicit none
     private
     public :: replace_new_line_mark
+    public :: replace_new_line_char
 
     character(*), public, parameter :: new_line_mark = "\n"
         !! library-specific new-line mark to be replaced with new-line character
@@ -10,8 +11,8 @@ module nml_util_replace
         !! new-line character
 
 contains
-    !>returns a string that replaces all new line mark
-    !>in `string` with new line character.
+    !>returns a string that replaces all new-line mark
+    !>in `string` with new-line character.
     pure function replace_new_line_mark(string) result(replaced)
         implicit none
         character(*), intent(in) :: string
@@ -21,6 +22,18 @@ contains
 
         replaced = replace_all(string, it=new_line_mark, with=new_line_char)
     end function replace_new_line_mark
+
+    !>returns a string that replaces all new-line character
+    !>in `string` with new line-mark.
+    pure function replace_new_line_char(string) result(replaced)
+        implicit none
+        character(*), intent(in) :: string
+            !! input string
+        character(:), allocatable :: replaced
+            !! new string
+
+        replaced = replace_all(string, it=new_line_char, with=new_line_mark)
+    end function replace_new_line_char
 
     !>returns a string that replaces all substrings `it`
     !>in `string` with `with`.
