@@ -40,10 +40,13 @@ module type_testResults
         type(test_case_result_type), private, allocatable :: test(:)
             !! results of test case
     contains
-        procedure, public, pass :: construct
+        procedure, public, pass :: construct_params
+        !* constructs the `test_results_type` instance
+        procedure, public, pass :: construct_spec
         !* constructs the `test_results_type` instance
         final :: finalize
         !* finalize the `test_results_type` instance
+        generic :: construct => construct_params, construct_spec
 
         procedure, public, pass :: check_test
         !* checks the result of the conditional formula in a test case
@@ -72,7 +75,7 @@ contains
     !>constructs the `test_results_type` instance.
     !>
     !>@note Each element of the `test_result_type` collection is not initialized.
-    pure subroutine construct(this, test_parameters)
+    pure subroutine construct_params(this, test_parameters)
         use :: type_testParameter
         implicit none
         class(test_results_type), intent(inout) :: this
@@ -82,7 +85,22 @@ contains
             !! referred only to the array dimension.
 
         allocate (this%test(size(test_parameters)))
-    end subroutine construct
+    end subroutine construct_params
+
+    !>constructs the `test_results_type` instance.
+    !>
+    !>@note Each element of the `test_result_type` collection is not initialized.
+    pure subroutine construct_spec(this, test_parameters)
+        use :: type_parameterizationSpec
+        implicit none
+        class(test_results_type), intent(inout) :: this
+            !! passed dummy argument
+        type(parameterization_spec_type), intent(in) :: test_parameters
+            !! test parameter type.
+            !! referred only to the array dimension.
+
+        allocate (this%test(test_parameters%get_number_of_test_cases()))
+    end subroutine construct_spec
 
     !>finalizes the `test_results_type` instance
     !>by deallocating the `test` component.
