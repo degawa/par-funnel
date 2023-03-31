@@ -86,7 +86,7 @@ See basic examples for an overview of the features.
 
 ## Basic examples
 ### test parameterization
-An example of test parameterization using `test_parameter_type` can be found at `example/testParameter/doublify.f90`.
+An example of test parameterization using `test_parameter_type` can be found at `example/1.testParameter/doublify.f90`.
 
 A unit test using `test_parameter_type` is as follows:
 1. describe arguments and expected results for the procedure under test.
@@ -142,7 +142,7 @@ if (actual == expect) then
 - Par-funnel calls each parameterized test executed in a unit test a "test case."
 
 ### work with optional arguments
-An example of a parameterized test including an optional argument using the `arguments_presence_type` can be found at `example/argumentsPresence/int2Str.f90`.
+An example of a parameterized test including an optional argument using the `arguments_presence_type` can be found at `example/2.argumentsPresence/int2Str.f90`.
 
 In this example, a function under test is `int_to_str`, which converts an integer to a string and returns the converted string. `int_to_str` has two optional arguments, `format` and `less_digits`. If `format` is passed, the conversion is performed according to the format specified by `format.` If the digits specified by `format` is less than the integer to be converted and `less_digits` is present, `less_digits` is changed to `.true.`.
 
@@ -191,7 +191,7 @@ if (arg_pres == [.true., .true.]) &
 This approach produces more combinations when the number of optional arguments exceeds 2. Improvements and Efficient implementations are needed.
 
 ### handling results of test cases
-An example of the `test_results_type` for gathering parameterized test cases can be found at `example/testResults/results.f90`.
+An example of the `test_results_type` for gathering parameterized test cases can be found at `example/3.testResults/results.f90`.
 
 A parameterized test is expected not to stop when a test under a condition fails and continues with the remaining conditions. In such a case, it is necessary to gather the results of each test case.
 
@@ -238,7 +238,7 @@ In this example, all test cases will pass, and no message will be output. Replac
 ## collaboration with unit test frameworks
 Again I explain that par-funnel is not a unit test framework and is intended to be used in collaboration with other unit test frameworks. Par-funnel can work with a framework if it has an assertion procedure that takes a logical value meaning that a condition is satisfied or not, and an error message.
 
-An example of collaboration with test-drive, a community-made unit test framework, can be found at `example/collabo/testdrive.f90`.
+An example of collaboration with test-drive, a community-made unit test framework, can be found at `example/4.collabo/testdrive.f90`.
 
 A significant change from `example/testResults/results.f90` is to replace the checking results with a procedure call provided by test-drive.
 ```diff
