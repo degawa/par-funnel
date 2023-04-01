@@ -12,7 +12,7 @@ There are some assertion libraries and unit test frameworks for Fortran:
 - [TOAST](https://github.com/thomasms/toast)
 - [vegetables](https://gitlab.com/everythingfunctional/vegetables)
 
-Unit tests are the key to keeping the software quality and must have maintainability. To test a procedure, passing a wide variety of argument combinations to the procedure requires writing tiny and similar procedures. This significantly decreases the maintainability of the unit tests. To solve this problem, unit test frameworks for other languages have the feature to parameterize unit tests, for example, the `[inlineData]` attribute of xUnit for C# and `mark.pararelize` of pytest for Python.
+Unit tests are the key to keeping the software quality and must have maintainability. To test a procedure, passing a wide variety of argument combinations to the procedure requires writing tiny and similar procedures. This significantly decreases the maintainability of the unit tests. To solve this problem, unit test frameworks for other languages have the feature to parameterize unit tests, for example, the `[inlineData]` attribute of xUnit for C# and `mark.parametrize` of pytest for Python.
 
 Unit test frameworks for Fortran mentioned above do not provide parameterization of unit tests utilizing Fortran standard features only and do not support optional arguments. This library, par-funnel, aims to provide features that
 - making parameter (arguments) list for unit tests using namelist,
