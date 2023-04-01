@@ -240,7 +240,7 @@ Again I explain that par-funnel is not a unit test framework and is intended to 
 
 An example of collaboration with test-drive, a community-made unit test framework, can be found at `example/4.collabo/testdrive.f90`.
 
-A significant change from `example/testResults/results.f90` is to replace the checking results with a procedure call provided by test-drive.
+A significant change from `example/3.testResults/results.f90` is to replace the checking results with a procedure call provided by test-drive.
 ```diff
 - if (results%get_number_of_failed_cases() > 0) then
 -     print *, results%get_summary_message()
