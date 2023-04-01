@@ -264,7 +264,7 @@ test_suite = [ &
              ]
 ```
 
-If a procedure under test has many arguments, the number of unit tests increases, and with it, the source code becomes more extended and messy. In addition, it isn't easy, especially for non-native English speakers, to find proper names that include the procedure name under tests and test conditions under the 63-character limit. par-funnel can solve these problems.
+If a procedure under test has many arguments, the number of unit tests increases, and with it, the source code becomes more bloated and messy. In addition, it isn't easy, especially for non-native English speakers, to find proper names that include the procedure name under tests and test conditions under the 63-character limit. par-funnel can solve these problems.
 
 Parameterization of unit tests with par-funnel must be done manually and is more complicated than with other libraries, such as xUnit and pytest. It would be great if these could be improved.
 
