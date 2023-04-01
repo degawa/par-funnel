@@ -190,6 +190,9 @@ if (arg_pres == [.true., .true.]) &
 
 This approach produces more combinations when the number of optional arguments exceeds 2. Improvements and Efficient implementations are needed.
 
+#### note
+- `test_parameter_type` and `arguments_presence_type` can be handled together using `parameterization_spec_type`. An example can be found at `example/5.parameterizationSpec/parameterizationSpec.f90`.
+
 ### handling results of test cases
 An example of the `test_results_type` for gathering parameterized test cases can be found at `example/3.testResults/results.f90`.
 
