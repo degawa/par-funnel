@@ -7,6 +7,8 @@ module type_testParameter
     public :: new_test_parameter
     public :: replace_new_line_mark
     public :: replace_new_line_char
+    public :: new_line_char
+    public :: new_line_mark
 
     !>This user-defined type contains procedure arguments
     !>and expected values that the procedure should return,
