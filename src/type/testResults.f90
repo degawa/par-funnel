@@ -98,8 +98,8 @@ contains
         class(test_results_type), intent(inout) :: this
             !! passed dummy argument
         type(parameterization_spec_type), intent(in) :: spec
-            !! test parameter type.
-            !! referred only to the array dimension.
+            !! parameterization specification.
+            !! referred only to the number of test cases.
 
         allocate (this%test(spec%get_number_of_test_cases()))
     end subroutine construct_spec
