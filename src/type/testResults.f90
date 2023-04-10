@@ -2,6 +2,7 @@ module type_testResults
     use, intrinsic :: iso_fortran_env
     implicit none
     private
+    public :: new_test_results_for
 
     character(*), public, parameter :: &
         failure_message_if_test_case_is_successful = "test passed"
@@ -73,7 +74,36 @@ module type_testResults
         !* gets summary
     end type test_results_type
 
+    interface new_test_results_for
+        procedure :: construct_results_type_param
+        procedure :: construct_results_type_spec
+    end interface
+
 contains
+    !>returns a new `test_results_type` instance.
+    pure function construct_results_type_param(test_parameters) result(new_test_results)
+        use :: type_testParameter
+        implicit none
+        type(test_parameter_type), intent(in) :: test_parameters(:)
+            !! test parameter type.
+            !! referred only to the array dimension.
+        type(test_results_type) :: new_test_results
+
+        call new_test_results%construct(test_parameters)
+    end function construct_results_type_param
+
+    !>returns a new `test_results_type` instance.
+    pure function construct_results_type_spec(spec) result(new_test_results)
+        use :: type_parameterizationSpec
+        implicit none
+        type(parameterization_spec_type), intent(in) :: spec
+            !! parameterization specification.
+            !! referred only to the number of test cases.
+        type(test_results_type) :: new_test_results
+
+        call new_test_results%construct(spec)
+    end function construct_results_type_spec
+
     !>constructs the `test_results_type` instance.
     !>
     !>@note Each element of the `test_result_type` collection is not initialized.
