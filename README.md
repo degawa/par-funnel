@@ -207,7 +207,7 @@ type(test_results_type) :: results
 
 ! construct test parameter and declare namelists
 
-call results%construct(params)
+results = new_test_results_for(params)
 ```
 
 In the parameterized test loop, the test results are gathered by the type-bound procedure `check_test()` to pass a logical value representing the success/failure of a test case and a message corresponding to the test result.
