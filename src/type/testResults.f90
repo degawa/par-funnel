@@ -92,16 +92,16 @@ contains
     !>constructs the `test_results_type` instance.
     !>
     !>@note Each element of the `test_result_type` collection is not initialized.
-    pure subroutine construct_spec(this, test_parameters)
+    pure subroutine construct_spec(this, spec)
         use :: type_parameterizationSpec
         implicit none
         class(test_results_type), intent(inout) :: this
             !! passed dummy argument
-        type(parameterization_spec_type), intent(in) :: test_parameters
+        type(parameterization_spec_type), intent(in) :: spec
             !! test parameter type.
             !! referred only to the array dimension.
 
-        allocate (this%test(test_parameters%get_number_of_test_cases()))
+        allocate (this%test(spec%get_number_of_test_cases()))
     end subroutine construct_spec
 
     !>destructs the `test_results_type` instance
