@@ -15,7 +15,7 @@ contains
 
         test_suite = [ &
                      new_unittest("new_parameterization_spec(), "// &
-                                  "it should return a 'arguments_presence_type' instance.", &
+                                  "it should return a 'parameterization_spec_type' instance.", &
                                   newParaSpec_should_return_parameterization_spec_type_instance) &
                      , new_unittest("new_parameterization_spec(), "// &
                                     "it should replace new-line in arguments and expected namelists with new-line mark"// &
