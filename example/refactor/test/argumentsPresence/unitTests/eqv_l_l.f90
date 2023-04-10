@@ -11,7 +11,7 @@ module refactor_test_argumentsPresence_unitTests_eqvLogicalLogical
 
 contains
     subroutine eqvLL_should_return_true_when_2_arrays_have_same_values(error)
-        use :: refactor_test_argumentsPresentce_unitTests_eqvLL_cases_l2l2
+        use :: refactor_test_argumentsPresentce_unitTests_eqvLL_runCases_l2l2
         implicit none
         type(error_type), allocatable, intent(out) :: error
         !! error handler
@@ -35,7 +35,7 @@ contains
     end subroutine eqvLL_should_return_true_when_2_arrays_have_same_values
 
     subroutine eqvLL_should_return_false_when_2_arrays_have_diffelent_values(error)
-        use :: refactor_test_argumentsPresentce_unitTests_eqvLL_cases_l2l2
+        use :: refactor_test_argumentsPresentce_unitTests_eqvLL_runCases_l2l2
         implicit none
         type(error_type), allocatable, intent(out) :: error
         !! error handler
@@ -67,7 +67,7 @@ contains
     end subroutine eqvLL_should_return_false_when_2_arrays_have_diffelent_values
 
     subroutine eqvLL_should_return_false_when_2_arrays_have_different_shapes(error)
-        use :: refactor_test_argumentsPresentce_unitTests_eqvLL_cases_l2l3
+        use :: refactor_test_argumentsPresentce_unitTests_eqvLL_runCases_l2l3
         implicit none
         type(error_type), allocatable, intent(out) :: error
             !! error handler

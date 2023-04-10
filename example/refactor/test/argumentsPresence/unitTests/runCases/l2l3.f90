@@ -1,4 +1,4 @@
-module refactor_test_argumentsPresentce_unitTests_eqvLL_cases_l2l3
+module refactor_test_argumentsPresentce_unitTests_eqvLL_runCases_l2l3
     use, intrinsic :: iso_fortran_env
     use :: testdrive_util, only:to_string
     use :: par_funnel
@@ -67,4 +67,4 @@ contains
         rhs(:) = .false.
         is_equal = .false.
     end subroutine teardown
-end module refactor_test_argumentsPresentce_unitTests_eqvLL_cases_l2l3
+end module refactor_test_argumentsPresentce_unitTests_eqvLL_runCases_l2l3
