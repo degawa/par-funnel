@@ -11,6 +11,7 @@ module refactor_test_argumentsPresence_unitTests_eqvLogicalLogical
 
 contains
     subroutine eqvLL_should_return_true_when_2_arrays_have_same_values(error)
+        use :: refactor_test_argumentsPresentce_unitTests_eqvLL_cases_l2l2
         implicit none
         type(error_type), allocatable, intent(out) :: error
         !! error handler
@@ -26,12 +27,15 @@ contains
                , new_test_parameter(arguments="lhs(:)=false,false rhs(:)=false,false", expected="is_equal=true") &
                ]) !&
         call results%construct(spec)
-        call run_test_cases_l2l2(spec, results)
+
+        call run_test_cases(spec, results)
         call check(error, results%all_cases_successful(), results%get_summary_message())
+
         call results%destruct()
     end subroutine eqvLL_should_return_true_when_2_arrays_have_same_values
 
     subroutine eqvLL_should_return_false_when_2_arrays_have_diffelent_values(error)
+        use :: refactor_test_argumentsPresentce_unitTests_eqvLL_cases_l2l2
         implicit none
         type(error_type), allocatable, intent(out) :: error
         !! error handler
@@ -56,44 +60,14 @@ contains
                ]) !&
         call results%construct(spec)
 
-        call run_test_cases_l2l2(spec, results)
+        call run_test_cases(spec, results)
         call check(error, results%all_cases_successful(), results%get_summary_message())
 
         call results%destruct()
     end subroutine eqvLL_should_return_false_when_2_arrays_have_diffelent_values
 
-    subroutine run_test_cases_l2l2(spec, results)
-        implicit none
-        type(parameterization_spec_type), intent(in) :: spec
-        type(test_results_type), intent(inout) :: results
-
-        logical :: lhs(2), rhs(2), is_equal
-        namelist /arguments/ lhs, rhs
-        namelist /expected/ is_equal
-
-        type(test_parameter_type) :: param
-        character(:), allocatable :: case_name
-        logical :: actual
-        integer(int32) :: case
-
-        do case = 1, results%get_number_of_test_cases()
-            param = spec%get_test_parameter_in(case)
-            read (unit=param%expected_namelist, nml=expected)
-            read (unit=param%arguments_namelist, nml=arguments)
-
-            case_name = "eqv_logical_logical() should return "//param%expected()// &
-                        " when compare "//param%arguments()
-
-            actual = (lhs == rhs)
-
-            call results%check_test(case, (actual .eqv. is_equal), &
-                                    case_name//new_line(" ")// &
-                                    "    expected : "//to_string(is_equal)//new_line(" ")// &
-                                    "    actual   : "//to_string(actual))
-        end do
-    end subroutine run_test_cases_l2l2
-
     subroutine eqvLL_should_return_false_when_2_arrays_have_different_shapes(error)
+        use :: refactor_test_argumentsPresentce_unitTests_eqvLL_cases_l2l3
         implicit none
         type(error_type), allocatable, intent(out) :: error
             !! error handler
@@ -142,36 +116,5 @@ contains
         call check(error, results%all_cases_successful(), results%get_summary_message())
 
         call results%destruct()
-    contains
-        subroutine run_test_cases(spec, results)
-            implicit none
-            type(parameterization_spec_type), intent(in) :: spec
-            type(test_results_type), intent(inout) :: results
-
-            logical :: lhs(2), rhs(3), is_equal
-            namelist /arguments/ lhs, rhs
-            namelist /expected/ is_equal
-
-            type(test_parameter_type) :: param
-            character(:), allocatable :: case_name
-            logical :: actual
-            integer(int32) :: case
-
-            do case = 1, results%get_number_of_test_cases()
-                param = spec%get_test_parameter_in(case)
-                read (unit=param%expected_namelist, nml=expected)
-                read (unit=param%arguments_namelist, nml=arguments)
-
-                case_name = "eqv_logical_logical() should return "//param%expected()// &
-                            " when compare "//param%arguments()
-
-                actual = (lhs == rhs)
-
-                call results%check_test(case, (actual .eqv. is_equal), &
-                                        case_name//new_line(" ")// &
-                                        "    expected : "//to_string(is_equal)//new_line(" ")// &
-                                        "    actual   : "//to_string(actual))
-            end do
-        end subroutine run_test_cases
     end subroutine eqvLL_should_return_false_when_2_arrays_have_different_shapes
 end module refactor_test_argumentsPresence_unitTests_eqvLogicalLogical
