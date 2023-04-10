@@ -35,12 +35,10 @@ contains
                ], &
                optional_args=[argument("fmt"), argument("less_digits")] &
                )
-        call results%construct(spec)
+        results = new_test_results_for(spec)
 
         call run_test_cases(spec, results)
         call check(error, results%all_cases_successful(), results%get_summary_message())
-
-        call results%destruct()
     end subroutine intToStr_parametarized_tests_covering_optional_arg_combination
 
     subroutine run_test_cases(spec, results)

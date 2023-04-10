@@ -58,15 +58,13 @@ program main
              , new_test_parameter(arguments="input=1000 fmt='(I2)' less_digits=false", &
                                   expected="string='**' less_digits=true") &
              ]
-    call results%construct(params)
+    results = new_test_results_for(params)
 
     call run_test_cases(params, results)
     if (results%get_number_of_failed_cases() > 0) then
         print *, results%get_summary_message()
         error stop
     end if
-
-    call results%destruct()
 contains
     subroutine run_test_cases(params, results)
         implicit none

@@ -26,12 +26,10 @@ contains
                , new_test_parameter(arguments="lhs(:)=true,false rhs(:)=true,false"  , expected="is_equal=true") &
                , new_test_parameter(arguments="lhs(:)=false,false rhs(:)=false,false", expected="is_equal=true") &
                ]) !&
-        call results%construct(spec)
+        results = new_test_results_for(spec)
 
         call run_test_cases(spec, results)
         call check(error, results%all_cases_successful(), results%get_summary_message())
-
-        call results%destruct()
     end subroutine eqvLL_should_return_true_when_2_arrays_have_same_values
 
     subroutine eqvLL_should_return_false_when_2_arrays_have_diffelent_values(error)
@@ -58,12 +56,10 @@ contains
                , new_test_parameter(arguments="lhs(:)=false,false rhs(:)=false,true", expected="is_equal=false") &
                , new_test_parameter(arguments="lhs(:)=false,false rhs(:)=true,false", expected="is_equal=false") &
                ]) !&
-        call results%construct(spec)
+        results = new_test_results_for(spec)
 
         call run_test_cases(spec, results)
         call check(error, results%all_cases_successful(), results%get_summary_message())
-
-        call results%destruct()
     end subroutine eqvLL_should_return_false_when_2_arrays_have_diffelent_values
 
     subroutine eqvLL_should_return_false_when_2_arrays_have_different_shapes(error)
@@ -110,11 +106,9 @@ contains
                 , new_test_parameter(arguments="lhs(:)=false,false rhs(:)=true,false,false",  expected="is_equal=false") &
                 , new_test_parameter(arguments="lhs(:)=false,false rhs(:)=false,false,false", expected="is_equal=false") &
                 ]) !&
-        call results%construct(spec)
+        results = new_test_results_for(spec)
 
         call run_test_cases(spec, results)
         call check(error, results%all_cases_successful(), results%get_summary_message())
-
-        call results%destruct()
     end subroutine eqvLL_should_return_false_when_2_arrays_have_different_shapes
 end module refactor_test_argumentsPresence_unitTests_eqvLogicalLogical
