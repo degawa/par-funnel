@@ -4,6 +4,7 @@ module test_testResults_collection
     use :: test_testResults_unitTests_checkTest
     use :: test_testResults_unitTests_getStatus
     use :: test_testResults_unitTests_getMessage
+    use :: test_testResults_unitTests_newTestResults
     implicit none
     private
     public :: collect_testResults
@@ -55,6 +56,18 @@ contains
                      , new_unittest("append_failure_messages_to(), "// &
                                     "it should append all failure messages to the end of the input string.", &
                                     appendFailureMsgs_should_append_failure_msg_to_the_end_of_arg) &
+                     , new_unittest("new_test_results_for(test_parameters), "// &
+                                    "it should return a 'test_results_type' instance.", &
+                                    newTestResParam_should_return_test_results_type_instance) &
+                     , new_unittest("new_test_results_for(parameterization_spec), "// &
+                                    "it shouldreturn a 'test_results_type' instance.", &
+                                    newTestResSpec_should_return_test_results_type_instance) &
+                     , new_unittest("new_test_results_for(test_parameters), "// &
+                                    "it should return a 'test_results_type' instance with the same num of results as test cases.", &
+                                    newTestResParam_should_return_instance_with_same_num_as_cases) &
+                     , new_unittest("new_test_results_for(parameterization_spec), "// &
+                                    "it should return a 'test_results_type' instance with the same num of results as test cases.", &
+                                    newTestResSpec_should_return_instance_with_same_num_as_cases) &
                      ]
     end subroutine collect_testResults
 end module test_testResults_collection
