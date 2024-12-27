@@ -13,6 +13,8 @@ module type_testParameter
     !>This user-defined type contains procedure arguments
     !>and expected values that the procedure should return,
     !>and the intended use is to describe multiple inputs within a unit test.
+    !>
+    !>All components are open to the public for type extension.
     type, public :: test_parameter_type
         character(:), public, allocatable :: arguments_namelist
             !! namelist of arguments to be passed to a procedure under test
@@ -26,7 +28,6 @@ module type_testParameter
 
         procedure, public, pass :: presented
         !* checks for the presence of an argument
-        !* gets the value of an expected result
         procedure, public, pass :: arguments
         !* gets the arguments
         procedure, public, pass :: expected
