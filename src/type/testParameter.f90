@@ -20,6 +20,8 @@ module type_testParameter
             !! namelist of arguments to be passed to a procedure under test
         character(:), public, allocatable :: expected_namelist
             !! namelist of expected values returned from/updated by a procedure under test
+        character(:), public, allocatable :: case_name
+            !! name of a test case using the test parameter
     contains
         procedure, public, pass :: construct => construct_component_namelists
         !* constructs the `test_parameter_type` instance
@@ -32,6 +34,13 @@ module type_testParameter
         !* gets the arguments
         procedure, public, pass :: expected
         !* gets the expected results
+
+        procedure, public, pass :: setup
+        !* setups a test using the arguments<br>
+        ! intended to be overridden by extended types
+        procedure, public, pass :: teardown
+        !* teardowns the test<br>
+        ! intended to be overridden by extended types
     end type test_parameter_type
 
     interface new_test_parameter
@@ -120,4 +129,20 @@ contains
 
         expc = drop_namelist_keywords(this%expected_namelist)
     end function expected
+
+    !>setups a test using the arguments and expected results.
+    !>This procedure is intended to be overridden by extended types.
+    subroutine setup(this)
+        implicit none
+        class(test_parameter_type), intent(inout) :: this
+            !! passed-object dummy argument
+    end subroutine setup
+
+    !>teardowns the test.
+    !>This procedure is intended to be overridden by extended types.
+    subroutine teardown(this)
+        implicit none
+        class(test_parameter_type), intent(inout) :: this
+            !! passed-object dummy argument
+    end subroutine teardown
 end module type_testParameter
