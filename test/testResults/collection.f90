@@ -60,7 +60,7 @@ contains
                                     "it should return a 'test_results_type' instance.", &
                                     newTestResParam_should_return_test_results_type_instance) &
                      , new_unittest("new_test_results_for(parameterization_spec), "// &
-                                    "it shouldreturn a 'test_results_type' instance.", &
+                                    "it should return a 'test_results_type' instance.", &
                                     newTestResSpec_should_return_test_results_type_instance) &
                      , new_unittest("new_test_results_for(test_parameters), "// &
                                     "it should return a 'test_results_type' instance with the same num of results as test cases.", &

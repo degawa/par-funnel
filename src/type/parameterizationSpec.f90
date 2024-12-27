@@ -13,7 +13,7 @@ module type_parameterizationSpec
     !>and the intended use is to manage the information
     !>related to the test  parameterization in one place.
     type, public :: parameterization_spec_type
-        type(test_parameter_type), private, allocatable :: test_parameters(:)
+        class(test_parameter_type), private, allocatable :: test_parameters(:)
             !! test parameters
         type(argument_type), private, allocatable :: optional_args(:)
             !! list of arguments having the optional attribute
@@ -44,7 +44,7 @@ contains
                                                        optional_args, &
                                                        replace_new_line) result(new_spec)
         implicit none
-        type(test_parameter_type), intent(in) :: parameter_cases(:)
+        class(test_parameter_type), intent(in) :: parameter_cases(:)
             !! list of test parameters
         type(argument_type), intent(in), optional :: optional_args(:)
             !! list of arguments name having the optional attribute
@@ -63,7 +63,7 @@ contains
         implicit none
         class(parameterization_spec_type), intent(inout) :: this
             !! passed dummy argument
-        type(test_parameter_type), intent(in) :: parameter_cases(:)
+        class(test_parameter_type), intent(in) :: parameter_cases(:)
             !! list of test parameters
         type(argument_type), intent(in), optional :: optional_args(:)
             !! list of arguments name having the optional attribute
@@ -71,7 +71,10 @@ contains
             !! if `.true.`, replace new-line char (`new_line()`) in namelists
             !! with new-line mark ("\n")
 
-        this%test_parameters = parameter_cases
+        ! do not use assignment operator like `this%test_parameters = parameter_cases`
+        ! it could not acculately copy some components of `parameter_cases`.
+        if (allocated(this%test_parameters)) deallocate (this%test_parameters)
+        allocate (this%test_parameters, source=parameter_cases)
 
         if (present(replace_new_line)) then
             if (replace_new_line) then
@@ -140,21 +143,24 @@ contains
         end if
     end function get_number_of_optional_arguments
 
-    !>returns the test parameter in a test case.
-    !>
-    !>The result is undefined when `case` is less than 1
-    !>or greater than the number of test cases.
+    !>returns the test parameter in a test case and
+    !>returns an empty `test_parameter_type` object
+    !>when `case` is less than 1 or greater than the number of test cases.
     pure function get_test_parameter_in(this, case) result(param)
         implicit none
         class(parameterization_spec_type), intent(in) :: this
             !! passed dummy argument
         integer(int32), intent(in) :: case
             !! the test case number
-        type(test_parameter_type) :: param
+        class(test_parameter_type), allocatable :: param
             !! the test parameter in a case
 
         if (1 <= case .and. case <= this%get_number_of_test_cases()) then
             param = this%test_parameters(case)
+        else
+            ! if `case` is out-of-range,
+            ! returns an empty test_parameter_type object
+            allocate (test_parameter_type :: param)
         end if
     end function get_test_parameter_in
 
