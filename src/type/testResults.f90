@@ -84,7 +84,7 @@ contains
     pure function construct_results_type_param(test_parameters) result(new_test_results)
         use :: type_testParameter
         implicit none
-        type(test_parameter_type), intent(in) :: test_parameters(:)
+        class(test_parameter_type), intent(in) :: test_parameters(:)
             !! test parameter type.
             !! referred only to the array dimension.
         type(test_results_type) :: new_test_results
@@ -96,7 +96,7 @@ contains
     pure function construct_results_type_spec(spec) result(new_test_results)
         use :: type_parameterizationSpec
         implicit none
-        type(parameterization_spec_type), intent(in) :: spec
+        class(parameterization_spec_type), intent(in) :: spec
             !! parameterization specification.
             !! referred only to the number of test cases.
         type(test_results_type) :: new_test_results
