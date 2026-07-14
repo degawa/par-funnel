@@ -21,43 +21,39 @@ program main
     implicit none
 
     type(test_parameter_type), allocatable :: params(:)
-    integer(int32) :: input, output
+    type(test_results_type) :: results
 
-    namelist /arguments/ input
-    namelist /expected/ output
-
-    ! construct test paramters
+    ! construct test parameters
+    ! by describing arguments and expected results in strings
     params = [ &
-             new_test_parameter(arguments='input=1', expected="output=2") &
-             , new_test_parameter(arguments='input=2', expected="output=4") &
+             new_test_parameter(arguments='input=1', expected='output=2') &
+             , new_test_parameter(arguments='input=2', expected='output=4') &
              ]
+    results = new_test_results_for(params)
 
     block
-        integer(int32) :: expect, actual
         integer(int32) :: case
-        do case = 1, size(params)
-            read (unit=params(case)%arguments_namelist, nml=arguments)
-            read (unit=params(case)%expected_namelist, nml=expected)
+        integer(int32) :: input, expected
 
-            expect = output
-            actual = doublify(input)
+        do case = 1, results%get_number_of_test_cases()
+            ! `get` reads a value by name.
+            ! No namelist declarations or read statements are needed.
+            call params(case)%get("input", input)
+            call params(case)%get("output", expected)
 
-            if (actual == expect) then
-                print *, "[PASSED]: doublify() should return "//params(case)%expected()// &
-                    " when input "//params(case)%arguments()
-            else
-                print *, "[FAILED]: doublify() should return "//params(case)%expected()// &
-                    " when input "//params(case)%arguments()
-                print *, "          expected : ", expect
-                print *, "          actual   : ", actual
-            end if
+            ! `check_equal` compares the values
+            ! and composes a failure message automatically.
+            call results%check_equal(case, doublify(input), expected, &
+                                     test_parameter=params(case), quantity="output")
         end do
-        !|### Execution result
-        !```console
-        ![FAILED]: doublify() should return output=2 when input input=1
-        !          expected :            2
-        !          actual   :            3
-        ![PASSED]: doublify() should return output=4 when input input=2
-        !```
     end block
+
+    print *, results%get_summary_message()
+    !|### Execution result
+    !```console
+    ! 1 test case(s) failed
+    !case 1: output: expected 2, but got 3 (arguments: input=1)
+    !```
+    !Note that case 2 passes by coincidence: the buggy formula
+    !`input + 2` also returns 4 when the input is 2.
 end program main

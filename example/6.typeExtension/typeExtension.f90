@@ -19,4 +19,9 @@ program example_typeExtension
 
     if (.not. results%all_cases_successful()) &
         print *, results%get_summary_message()
+    !|### Execution result
+    !```console
+    ! 1 test case(s) failed
+    !case 1: output: expected 2, but got 3 (arguments: input=1)
+    !```
 end program example_typeExtension

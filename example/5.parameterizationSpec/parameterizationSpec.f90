@@ -1,7 +1,6 @@
 module example_parameterizationSpec_unittests
     use, intrinsic :: iso_fortran_env
     use :: testdrive, only:error_type, check
-    use :: testdrive_util, only:occurred, to_string
     use :: par_funnel
     implicit none
     private
@@ -9,13 +8,14 @@ module example_parameterizationSpec_unittests
 
 contains
     subroutine intToStr_parametarized_tests_covering_optional_arg_combination(error)
-        use :: par_funnel
         implicit none
         type(error_type), allocatable, intent(out) :: error
 
         type(parameterization_spec_type) :: spec
         type(test_results_type) :: results
 
+        ! `parameterization_spec_type` gathers the test parameters
+        ! and the names of the optional arguments in one place.
         spec = new_parameterization_spec( &
                [ &
                new_test_parameter(arguments="input=1000", &
@@ -46,114 +46,48 @@ contains
         type(parameterization_spec_type), intent(in) :: spec
         type(test_results_type), intent(inout) :: results
 
-        ! arguments
-        integer(int32) :: input
-        character(32) :: fmt
-        logical :: less_digits
-        ! expected
-        character(12) :: string
-
-        namelist /arguments/ input, fmt, less_digits
-        namelist /expected/ string, less_digits
-
-        character(:), allocatable :: string_act
-        logical :: less_digits_exp
-
         type(test_parameter_type) :: param
         type(arguments_presence_type) :: arg_pres
-        character(:), allocatable :: case_name
-
         integer(int32) :: case
-        logical :: cond
+        integer(int32) :: input
+        character(:), allocatable :: fmt, exp_string, act_string
+        logical :: exp_less_digits, act_less_digits
+        logical :: fmt_found
 
         do case = 1, results%get_number_of_test_cases()
-            call setup_case(case, spec, param, arg_pres, input, fmt, less_digits, string, less_digits_exp)
-
-            case_name = "int_to_str() should return "//param%expected()// &
-                        " when input "//param%arguments()
-            write (output_unit, '(10X, "- ", A)') case_name
-
-            !&<
-            if (arg_pres .has. [.false., .false.]) &
-                string_act = int_to_str(input)
-            if (arg_pres .has. [.true., .false.]) &
-                string_act = int_to_str(input, fmt)
-            if (arg_pres .has. [.false., .true.]) &
-                string_act = int_to_str(input, less_digits=less_digits)
-            if (arg_pres .has. [.true., .true.]) &
-                string_act = int_to_str(input, fmt, less_digits)
-            !&>
-
-            cond = (string_act == trim(string))
-            if (.not. param%presented("less_digits")) then
-                call results%check_test(case, cond, &
-                                        failure_message(case_name, trim(string), string_act))
-            else
-                cond = all([cond, (less_digits .eqv. less_digits_exp)])
-                call results%check_test(case, cond, &
-                                        failure_message(case_name, trim(string), string_act, &
-                                                        [less_digits_exp, less_digits]))
-            end if
-
-            call teardown_case(string_act)
-        end do
-    contains
-        subroutine setup_case(case, spec, param, arg_pres, input, fmt, less_digits, string, less_digits_out)
-            implicit none
-            integer(int32), intent(in) :: case
-            type(test_parameter_type), intent(out) :: param
-            type(parameterization_spec_type), intent(in) :: spec
-            type(arguments_presence_type), intent(inout) :: arg_pres
-            ! arguments
-            integer(int32), intent(out) :: input
-            character(32), intent(out) :: fmt
-            logical, intent(out) :: less_digits, less_digits_out
-            ! expected
-            character(12), intent(out) :: string
-
-            namelist /arguments/ input, fmt, less_digits
-            namelist /expected/ string, less_digits
-
             param = spec%get_test_parameter_in(case)
-            ! expected
-            read (unit=param%expected_namelist, nml=expected)
-            less_digits_out = less_digits
 
-            ! arguments
-            read (unit=param%arguments_namelist, nml=arguments)
+            call param%get("input", input)
+            call param%get("fmt", fmt, found=fmt_found)
+            call param%get("string", exp_string)
 
+            write (output_unit, '(10X, "- ", A)') "int_to_str() should return "//param%expected()// &
+                " when input "//param%arguments()
+
+            ! the presence statuses of the optional arguments declared in the spec
+            ! are converted into an index by `as_index`,
+            ! which is equivalent to `param%presence_index("fmt", "less_digits")`.
             arg_pres = spec%get_optional_arguments_presence_in(case)
-        end subroutine setup_case
+            select case (arg_pres%as_index())
+            case (0); act_string = int_to_str(input)
+            case (1); act_string = int_to_str(input, fmt)
+            case (2); act_string = int_to_str(input, less_digits=act_less_digits)
+            case (3); act_string = int_to_str(input, fmt, act_less_digits)
+            end select
 
-        subroutine teardown_case(string_act)
-            implicit none
-            character(:), allocatable, intent(inout) :: string_act
-
-            deallocate (string_act)
-        end subroutine teardown_case
-
-        function failure_message(case_name, str_exp, str_act, less_digits) result(message)
-            implicit none
-            character(*), intent(in) :: case_name
-            character(*), intent(in) :: str_exp, str_act
-            logical, intent(in), optional :: less_digits(2)
-            character(:), allocatable :: message
-
-            character(:), allocatable :: less_digits_exp, less_digits_act
-            less_digits_exp = ""
-            less_digits_act = ""
-            if (present(less_digits)) then
-                less_digits_exp = to_string(less_digits(1))
-                less_digits_act = to_string(less_digits(2))
+            if (param%presented("less_digits")) then
+                call param%get("less_digits", exp_less_digits, from="expected")
+                call results%check_equal(case, act_string//merge(" T", " F", act_less_digits), &
+                                         exp_string//merge(" T", " F", exp_less_digits), &
+                                         test_parameter=param, quantity="string and less_digits")
+            else
+                call results%check_equal(case, act_string, exp_string, &
+                                         test_parameter=param, quantity="string")
             end if
-            message = case_name//new_line(" ")// &
-                      "    expected : "//trim(string)//", "//less_digits_exp//new_line(" ")// &
-                      "    actual   : "//string_act//", "//less_digits_act
-        end function failure_message
+        end do
     end subroutine run_test_cases
 
     function int_to_str(i32, fmt, less_digits) result(str)
-        use, intrinsic :: iso_fortran_env
         implicit none
         integer(int32), intent(in) :: i32
         character(*), intent(in), optional :: fmt
@@ -222,8 +156,6 @@ program parameterization_spec
     !          - int_to_str() should return string='**' less_digits=true when input input=000 fmt='(I2)' less_digits=false
     !       ... int_to_str() parametarized tests covering optional arguments combinations [EXPECTED FAIL]
     !  Message: 1 test case(s) failed
-    !case 7: int_to_str() should return string='**' less_digits=true when input input=000 fmt='(I2)' less_digits=false
-    !    expected : **, T
-    !    actual   : 0, F
+    !case 7: string and less_digits: expected '** T', but got '0 F' (arguments: input=000 fmt='(I2)' less_digits=false)
     !```
 end program parameterization_spec

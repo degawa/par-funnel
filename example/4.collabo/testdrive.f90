@@ -8,9 +8,6 @@ module collab_testdrive_unittests
 contains
     subroutine intToStr_parametarized_tests_covering_optional_arg_combination(error)
         use, intrinsic :: iso_fortran_env
-        use :: par_funnel
-        use :: testdrive, only:check, error_type
-        use :: testdrive_util, only:occurred, to_string
         implicit none
         type(error_type), allocatable, intent(out) :: error
 
@@ -36,6 +33,10 @@ contains
         results = new_test_results_for(params)
 
         call run_test_cases(params, results)
+
+        ! pass the results to the unit test framework:
+        ! the summary message composed by par-funnel
+        ! is reported through the framework's check.
         call check(error, results%all_cases_successful(), results%get_summary_message())
     contains
         subroutine run_test_cases(params, results)
@@ -43,65 +44,33 @@ contains
             type(test_parameter_type), intent(in) :: params(:)
             type(test_results_type), intent(inout) :: results
 
-            integer(int32) :: input
-            character(32) :: fmt
-            logical :: less_digits
-            character(12) :: string
-
-            namelist /arguments/ input, fmt, less_digits
-            namelist /expected/ string, less_digits
-
-            character(12) :: exp_string
-            character(:), allocatable :: act_string
-            logical :: exp_less_digits
-
-            type(arguments_presence_type) :: arg_pres
-            character(:), allocatable :: case_name, message
-
             integer(int32) :: case
-            logical :: cond
+            integer(int32) :: input
+            character(:), allocatable :: fmt, exp_string, act_string
+            logical :: exp_less_digits, act_less_digits
+            logical :: fmt_found
 
             do case = 1, results%get_number_of_test_cases()
-                ! expected results
-                read (unit=params(case)%expected_namelist, nml=expected)
-                exp_string = trim(string)
-                exp_less_digits = less_digits
+                call params(case)%get("input", input)
+                call params(case)%get("fmt", fmt, found=fmt_found)
+                call params(case)%get("string", exp_string)
 
-                ! procedure arguments
-                read (unit=params(case)%arguments_namelist, nml=arguments)
+                select case (params(case)%presence_index("fmt", "less_digits"))
+                case (0); act_string = int_to_str(input)
+                case (1); act_string = int_to_str(input, fmt)
+                case (2); act_string = int_to_str(input, less_digits=act_less_digits)
+                case (3); act_string = int_to_str(input, fmt, act_less_digits)
+                end select
 
-                case_name = "int_to_str() should return "//params(case)%expected()// &
-                            " when input "//params(case)%arguments()
-
-                ! consider optional attribute
-                arg_pres = arguments_presence([params(case)%presented("fmt"), &
-                                               params(case)%presented("less_digits")])
-
-                !&<
-                if (arg_pres .has. [.false., .false.]) &
-                    act_string = int_to_str(input)
-                if (arg_pres .has. [.true., .false.]) &
-                    act_string = int_to_str(input, fmt)
-                if (arg_pres .has. [.false., .true.]) &
-                    act_string = int_to_str(input, less_digits=less_digits)
-                if (arg_pres .has. [.true., .true.]) &
-                    act_string = int_to_str(input, fmt, less_digits)
-                !&>
-
-                if (.not. params(case)%presented("less_digits")) then
-                    cond = (act_string == trim(exp_string))
-                    message = case_name//new_line(" ")// &
-                              "    expected : "//trim(exp_string)//new_line(" ")// &
-                              "    actual   : "//act_string
+                if (params(case)%presented("less_digits")) then
+                    call params(case)%get("less_digits", exp_less_digits, from="expected")
+                    call results%check_equal(case, act_string//merge(" T", " F", act_less_digits), &
+                                             exp_string//merge(" T", " F", exp_less_digits), &
+                                             test_parameter=params(case), quantity="string and less_digits")
                 else
-                    cond = (act_string == trim(exp_string)) .and. (less_digits .eqv. exp_less_digits)
-                    message = case_name//new_line(" ")// &
-                              "    expected : "//trim(exp_string)//", "//to_string(exp_less_digits)//new_line(" ")// &
-                              "    actual   : "//act_string//", "//to_string(less_digits)
+                    call results%check_equal(case, act_string, exp_string, &
+                                             test_parameter=params(case), quantity="string")
                 end if
-
-                call results%check_test(case, cond, message)
-
             end do
         end subroutine run_test_cases
     end subroutine intToStr_parametarized_tests_covering_optional_arg_combination
@@ -169,11 +138,7 @@ program collab_testdrive
     !  Starting int_to_str() parametarized tests covering optional arguments combinations ... (1/1)
     !       ... int_to_str() parametarized tests covering optional arguments combinations [EXPECTED FAIL]
     !  Message: 2 test case(s) failed
-    !case 1: int_to_str() should return string='1000' when input input=000
-    !    expected : 1000
-    !    actual   : 0
-    !case 6: int_to_str() should return string='1000' less_digits=false when input input=000 fmt='(I4)' less_digits=false
-    !    expected : 1000, F
-    !    actual   : 0, F
+    !case 1: string: expected '1000', but got '0' (arguments: input=000)
+    !case 6: string and less_digits: expected '1000 F', but got '0 F' (arguments: input=000 fmt='(I4)' less_digits=false)
     !```
 end program collab_testdrive

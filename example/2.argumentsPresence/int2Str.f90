@@ -39,13 +39,7 @@ program main
     implicit none
 
     type(test_parameter_type), allocatable :: params(:)
-    integer(int32) :: input
-    character(32) :: fmt
-    logical :: less_digits
-    character(12) :: string
-
-    namelist /arguments/ input, fmt, less_digits
-    namelist /expected/ string, less_digits
+    type(test_results_type) :: results
 
     params = [ &
              new_test_parameter(arguments="input=1000", &
@@ -63,68 +57,65 @@ program main
              , new_test_parameter(arguments="input=1000 fmt='(I2)' less_digits=false", &
                                   expected="string='**' less_digits=true") &
              ]
+    results = new_test_results_for(params)
 
     block
-        character(12) :: exp_string
-        character(:), allocatable :: act_string
-        logical :: exp_less_digits
-
-        type(arguments_presence_type) :: arg_pres
-        character(:), allocatable :: case_name
-
         integer(int32) :: case
+        integer(int32) :: input
+        character(:), allocatable :: fmt, exp_string, act_string
+        logical :: exp_less_digits, act_less_digits
+        logical :: fmt_found
 
-        do case = 1, size(params)
-            ! reading expected results
-            read (unit=params(case)%expected_namelist, nml=expected)
-            exp_string = trim(string)
-            exp_less_digits = less_digits
+        do case = 1, results%get_number_of_test_cases()
+            call params(case)%get("input", input)
+            call params(case)%get("fmt", fmt, found=fmt_found)
+            call params(case)%get("string", exp_string)
 
-            ! reading procedure arguments
-            read (unit=params(case)%arguments_namelist, nml=arguments)
+            ! `presence_index` converts the presence statuses of the optional
+            ! arguments into an index (bit pattern: fmt -> bit 0, less_digits -> bit 1),
+            ! so that the calls with the optional arguments can be branched
+            ! in a `select case` construct instead of `if` statement chains.
+            select case (params(case)%presence_index("fmt", "less_digits"))
+            case (0); act_string = int_to_str(input)
+            case (1); act_string = int_to_str(input, fmt)
+            case (2); act_string = int_to_str(input, less_digits=act_less_digits)
+            case (3); act_string = int_to_str(input, fmt, act_less_digits)
+            end select
 
-            case_name = "int_to_str() should return "//params(case)%expected()// &
-                        " when input "//params(case)%arguments()
+            if (params(case)%presented("less_digits")) then
+                ! `less_digits` exists in both the arguments and expected namelists.
+                ! `from="expected"` restricts the search to the expected namelist.
+                call params(case)%get("less_digits", exp_less_digits, from="expected")
 
-            ! consider optional attribute
-            arg_pres = arguments_presence([params(case)%presented("fmt"), &
-                                           params(case)%presented("less_digits")])
-            !&<
-            if (arg_pres .has. [.false., .false.]) &
-                act_string = int_to_str(input)
-            if (arg_pres .has. [.true., .false.]) &
-                act_string = int_to_str(input, fmt)
-            if (arg_pres .has. [.false., .true.]) &
-                act_string = int_to_str(input, less_digits=less_digits)
-            if (arg_pres .has. [.true., .true.]) &
-                act_string = int_to_str(input, fmt, less_digits)
-            !&>
-
-            if (.not. params(case)%presented("less_digits")) then
-                if (act_string == trim(exp_string)) then
-                    print *, "[PASSED]: "//case_name
-                else
-                    print *, "[FAILED]: "//case_name
-                    print *, "    expected : ", exp_string
-                    print *, "    actual   : ", act_string
-                end if
+                call results%check_equal(case, act_string//merge(" T", " F", act_less_digits), &
+                                         exp_string//merge(" T", " F", exp_less_digits), &
+                                         test_parameter=params(case), quantity="string and less_digits")
             else
-                if ((act_string == trim(exp_string)) .and. (less_digits .eqv. exp_less_digits)) then
-                    print *, "[PASSED]: "//case_name
-                else
-                    print *, "[FAILED]: "//case_name
-                    print *, "    expected : ", exp_string, exp_less_digits
-                    print *, "    actual   : ", act_string, less_digits
-                end if
+                call results%check_equal(case, act_string, exp_string, &
+                                         test_parameter=params(case), quantity="string")
             end if
         end do
-        !|### Execution result
-        ![PASSED]: int_to_str() should return string='1000' when input input=1000
-        ![PASSED]: int_to_str() should return string='1000' when input input=1000 fmt='(I4)'
-        ![PASSED]: int_to_str() should return string='**' when input input=1000 fmt='(I2)'
-        ![PASSED]: int_to_str() should return string='1000' less_digits=false when input input=1000 less_digits=true
-        ![PASSED]: int_to_str() should return string='1000' less_digits=false when input input=1000 less_digits=false
-        ![PASSED]: int_to_str() should return string='1000' less_digits=false when input input=1000 fmt='(I4)' less_digits=false
-        ![PASSED]: int_to_str() should return string='**' less_digits=true when input input=1000 fmt='(I2)' less_digits=false
     end block
+
+    block
+        integer(int32) :: case
+
+        do case = 1, results%get_number_of_test_cases()
+            if (results%get_success_status_of(case)) then
+                print *, "[PASSED]: case ", case
+            else
+                print *, "[FAILED]: "//results%get_failure_message_of(case)
+            end if
+        end do
+    end block
+    !|### Execution result
+    !```console
+    ! [PASSED]: case            1
+    ! [PASSED]: case            2
+    ! [PASSED]: case            3
+    ! [PASSED]: case            4
+    ! [PASSED]: case            5
+    ! [PASSED]: case            6
+    ! [PASSED]: case            7
+    !```
 end program main

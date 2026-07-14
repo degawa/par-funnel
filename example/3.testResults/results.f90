@@ -36,7 +36,6 @@ program main
     use, intrinsic :: iso_fortran_env
     use :: function_sample_under_test
     use :: par_funnel
-    use :: testdrive_util, only:to_string
     implicit none
 
     type(test_parameter_type), allocatable :: params(:)
@@ -49,116 +48,56 @@ program main
                                   expected="string='1000'") &
              , new_test_parameter(arguments="input=1000 fmt='(I2)'", &
                                   expected="string='**'") &
-             , new_test_parameter(arguments="input=1000 less_digits=true", &
-                                  expected="string='1000' less_digits=false") &
-             , new_test_parameter(arguments="input=1000 less_digits=false", &
-                                  expected="string='1000' less_digits=false") &
-             , new_test_parameter(arguments="input=1000 fmt='(I4)' less_digits=false", &
-                                  expected="string='1000' less_digits=false") &
-             , new_test_parameter(arguments="input=1000 fmt='(I2)' less_digits=false", &
-                                  expected="string='**' less_digits=true") &
+             , new_test_parameter(arguments="input=1000 fmt='(I2)'", & ! intentionally wrong expectation
+                                  expected="string='1000'") & ! to show a failure message
              ]
+
+    ! `test_results_type` stores the result of each test case.
+    ! It is constructed from the test parameters
+    ! and refers only to the number of test cases.
     results = new_test_results_for(params)
 
     call run_test_cases(params, results)
-    if (results%get_number_of_failed_cases() > 0) then
-        print *, results%get_summary_message()
-        error stop
-    end if
+
+    ! `test_results_type` provides procedures for summarizing the results:
+    ! - `get_number_of_test_cases()`/`get_number_of_failed_cases()`
+    ! - `get_success_status_of(case)`/`get_failure_message_of(case)`
+    ! - `all_cases_successful()`
+    ! - `get_summary_message()`
+    print '(A,I0,A,I0)', " failed/total: ", results%get_number_of_failed_cases(), &
+        "/", results%get_number_of_test_cases()
+    print *, results%get_summary_message()
 contains
     subroutine run_test_cases(params, results)
         implicit none
         type(test_parameter_type), intent(in) :: params(:)
         type(test_results_type), intent(inout) :: results
 
-        integer(int32) :: input
-        character(32) :: fmt
-        logical :: less_digits
-        character(12) :: string
-
-        namelist /arguments/ input, fmt, less_digits
-        namelist /expected/ string, less_digits
-
-        character(12) :: exp_string
-        character(:), allocatable :: act_string
-        logical :: exp_less_digits
-
-        type(arguments_presence_type) :: arg_pres
-        character(:), allocatable :: case_name, message
-
         integer(int32) :: case
-        logical :: cond
+        integer(int32) :: input
+        character(:), allocatable :: fmt, exp_string, act_string
+        logical :: fmt_found
 
         do case = 1, results%get_number_of_test_cases()
-            ! expected results
-            read (unit=params(case)%expected_namelist, nml=expected)
-            exp_string = trim(string)
-            exp_less_digits = less_digits
+            call params(case)%get("input", input)
+            call params(case)%get("fmt", fmt, found=fmt_found)
+            call params(case)%get("string", exp_string)
 
-            ! procedure arguments
-            read (unit=params(case)%arguments_namelist, nml=arguments)
+            select case (params(case)%presence_index("fmt"))
+            case (0); act_string = int_to_str(input)
+            case (1); act_string = int_to_str(input, fmt)
+            end select
 
-            case_name = "int_to_str() should return "//params(case)%expected()// &
-                        " when input "//params(case)%arguments()
-
-            ! consider optional attribute
-            arg_pres = arguments_presence([params(case)%presented("fmt"), &
-                                           params(case)%presented("less_digits")])
-
-            !&<
-            if (arg_pres .has. [.false., .false.]) &
-                act_string = int_to_str(input)
-            if (arg_pres .has. [.true., .false.]) &
-                act_string = int_to_str(input, fmt)
-            if (arg_pres .has. [.false., .true.]) &
-                act_string = int_to_str(input, less_digits=less_digits)
-            if (arg_pres .has. [.true., .true.]) &
-                act_string = int_to_str(input, fmt, less_digits)
-            !&>
-
-            if (.not. params(case)%presented("less_digits")) then
-                cond = (act_string == trim(exp_string))
-                message = case_name//new_line(" ")// &
-                          "    expected : "//trim(exp_string)//new_line(" ")// &
-                          "    actual   : "//act_string
-            else
-                cond = (act_string == trim(exp_string)) .and. (less_digits .eqv. exp_less_digits)
-                message = case_name//new_line(" ")// &
-                          "    expected : "//trim(exp_string)//", "//to_string(exp_less_digits)//new_line(" ")// &
-                          "    actual   : "//act_string//", "//to_string(less_digits)
-            end if
-
-            call results%check_test(case, cond, message)
-
+            ! `check_equal` stores the comparison result to `results`
+            ! with an automatically composed failure message.
+            call results%check_equal(case, act_string, exp_string, &
+                                     test_parameter=params(case), quantity="string")
         end do
     end subroutine run_test_cases
     !|### Execution result
-    !In this example, all test cases will pass, and no message will be output.
-    !Replacing `cond` with `.false.` in `call results%check_test(case, cond, message)`,
-    !placed a few lines above,
-    !forces all test cases to fail and the message output below:
-    !
-    !    7 test case(s) failed
-    !case 1: int_to_str() should return string='1000' when input input=1000
-    !    expected : 1000
-    !    actual   : 1000
-    !case 2: int_to_str() should return string='1000' when input input=1000 fmt='(I4)'
-    !    expected : 1000
-    !    actual   : 1000
-    !case 3: int_to_str() should return string='**' when input input=1000 fmt='(I2)'
-    !    expected : **
-    !    actual   : **
-    !case 4: int_to_str() should return string='1000' less_digits=false when input input=1000 less_digits=true
-    !    expected : 1000, F
-    !    actual   : 1000, F
-    !case 5: int_to_str() should return string='1000' less_digits=false when input input=1000 less_digits=false
-    !    expected : 1000, F
-    !    actual   : 1000, F
-    !case 6: int_to_str() should return string='1000' less_digits=false when input input=1000 fmt='(I4)' less_digits=false
-    !    expected : 1000, F
-    !    actual   : 1000, F
-    !case 7: int_to_str() should return string='**' less_digits=true when input input=1000 fmt='(I2)' less_digits=false
-    !    expected : **, T
-    !    actual   : **, T
-    !ERROR STOP
+    !```console
+    ! failed/total: 1/4
+    ! 1 test case(s) failed
+    !case 4: string: expected '1000', but got '**' (arguments: input=1000 fmt='(I2)')
+    !```
 end program main
