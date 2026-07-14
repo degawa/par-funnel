@@ -10,13 +10,12 @@ There are some assertion libraries and unit test frameworks for Fortran:
 - [pFUnit](https://github.com/Goddard-Fortran-Ecosystem/pFUnit)
 - [test-drive](https://github.com/fortran-lang/test-drive)
 - [TOAST](https://github.com/thomasms/toast)
-- [veggies](https://gitlab.com/everythingfunctional/veggies) and
-[garden](https://gitlab.com/everythingfunctional/garden)
+- [veggies](https://gitlab.com/everythingfunctional/veggies) and [garden](https://gitlab.com/everythingfunctional/garden)
 
-Unit tests are the key to keeping the software quality and must have maintainability. To test a procedure, passing a wide variety of argument combinations to the procedure requires writing tiny and similar procedures. This significantly decreases the maintainability of the unit tests. To solve this problem, unit test frameworks for other languages have the feature to parameterize unit tests, for example, the `[inlineData]` attribute of xUnit for C# and `mark.parametrize` of pytest for Python.
+Unit tests are the key to maintaining software quality and must be maintainable. To test a procedure, passing a wide variety of argument combinations requires writing many similar, tiny procedures. This significantly decreases the maintainability of the unit tests. To solve this problem, unit test frameworks for other languages offer features to parameterize unit tests, for example, the `[inlineData]` attribute in xUnit for C# and `mark.parametrize` in pytest for Python.
 
-Unit test frameworks for Fortran mentioned above do not provide parameterization of unit tests utilizing Fortran standard features only and do not support optional arguments. This library, par-funnel, aims to provide features that
-- making parameter (arguments) list for unit tests using namelist,
+Unit test frameworks for Fortran mentioned above do not provide parameterization of unit tests using only Fortran standard features and do not support optional arguments. This library, par-funnel, aims to provide these features.
+- making a parameter (argument) list for unit tests using namelist,
 - supporting optional arguments, and
 - handling results of parameterized tests.
 
@@ -24,8 +23,8 @@ Par-funnel is not a unit test framework but is intended to be used with other un
 
 ## Getting started
 ### Requirements
-Par-funnel has been tested only on Windows 10 but may also work on Linux/Mac OS.
-Due to the use of relatively new features, including object-oriented programming, a recent compiler is required to build par-funnel. The compilers and versions listed below have been used to develop par-funnel.
+Par-funnel has been tested only on Windows 10 but may also work on Linux and macOS.
+Because it uses relatively new features, including object-oriented programming, a recent compiler is required to build par-funnel. The compilers and versions listed below have been used to develop par-funnel.
 
 - Modern Fortran compiler
     - gfortran 11.2 bundled with [quickstart Fortran on Windows](https://github.com/LKedward/quickstart-fortran)
@@ -34,11 +33,11 @@ Due to the use of relatively new features, including object-oriented programming
 - [Fortran Package Manager](https://github.com/fortran-lang/fpm) (fpm) 0.7.0 alpha
     - Par-funnel is created as an fpm project.
 - [test-drive](https://github.com/fortran-lang/test-drive) 0.4.0
-    - Par-funnel provide an example of a collaboration with test-drive.
+    - Par-funnel provides an example of a collaboration with test-drive.
 - [FORD](https://github.com/Fortran-FOSS-Programmers/ford) (optional)
 
 ### Get the code
-To get the code, execute the following commnad:
+To get the code, execute the following command:
 
 ```console
 git clone https://github.com/degawa/par-funnel.git
@@ -75,181 +74,196 @@ To use par-funnel in your fpm project, add the following to the fpm.toml.
 par-funnel = {git = "https://github.com/degawa/par-funnel.git"}
 ```
 
-## usage
-As mentioned above, par-funnel provides three features:
-- Making an arguments list to pass to a procedure under test.
-- Supporting optional arguments.
-- Handling results of parameterized tests.
+## Usage
+A parameterized unit test with par-funnel consists of only three steps:
 
-These are achieved by using the user-defined types provided by par-funnel.
+1. describe arguments and expected results for the procedure under test in strings.
+2. get the values by name using `get`.
+3. execute the procedure under test and check the actual values using `check_equal`.
 
-See basic examples for an overview of the features.
-
-## Basic examples
-### test parameterization
-An example of test parameterization using `test_parameter_type` can be found at `example/1.testParameter/doublify.f90`.
-
-A unit test using `test_parameter_type` is as follows:
-1. describe arguments and expected results for the procedure under test.
-2. allocate the `test_parameter_type` instance according to the arguments and expected results.
-3. declare namelists for the arguments and expected results.
-4. read the arguments and expected results from the namelists.
-5. execute the procedure under test with the arguments, and get the actual values.
-6. check the actual values compared to the expected results.
-
-Parameterization can be done by repeating steps 3 through 6 with the `test_parameter_type` array.
-
-The `new_test_parameter` returns a `test_parameter_type` instance that contains the namelists for arguments and expected results. In this example, a function under test is `doublify`, which returns the value of input multiplied by 2.
-```Fortran
-use :: par_funnel
-
-type(test_parameter_type), allocatable :: params(:)
-params = [ &
-         new_test_parameter(arguments='input=1', expected="output=2") &
-         , new_test_parameter(arguments='input=2', expected="output=4") &
-         ]
-```
-
-Then declares namelists for aruments and expected results.
-```Fortran
-integer(int32) :: input, output
-
-namelist /arguments/ input
-namelist /expected/ output
-```
-
-In the `do`-loop, using `case` as the loop counter, read namelists via the internal file.
-```Fortran
-read (unit=params(case)%arguments_namelist, nml=arguments)
-read (unit=params(case)%expected_namelist, nml=expected)
-```
-
-Executing the procedure under test, `doublify`, with the arguments read from namelist, and then checking the result.
-```Fortran
-integer(int32) :: expected, actual
-
-expect = output
-actual = doublify(input)
-
-if (actual == expect) then
-...
-```
-
-#### note
-- The group name of the namelists must be `arguments` and `expected`.
-- Par-funnel cannot parse namelists.
-    - Blank spaces at both sides of `=` are not allowed.
-    - A blank space must separate variable groups, for example `new_test_parameter(arguments='input1=1 input2=2', expected="output=2")`
-- Par-funnel calls each parameterized test executed in a unit test a "test case."
-
-### work with optional arguments
-An example of a parameterized test including an optional argument using the `arguments_presence_type` can be found at `example/2.argumentsPresence/int2Str.f90`.
-
-In this example, a function under test is `int_to_str`, which converts an integer to a string and returns the converted string. `int_to_str` has two optional arguments, `format` and `less_digits`. If `format` is passed, the conversion is performed according to the format specified by `format.` If the digits specified by `format` is less than the integer to be converted and `less_digits` is present, `less_digits` is changed to `.true.`.
-
-The namelist feature can automatically detect the presence of arguments, but the user must specify the optional arguments.
-
-The `arguments_presence` returns an `arguments_presence_type` instance. Arguments are logical arrays representing the presence of optional arguments. The type-bound procedure `presented` find an argument name from the namelist of arguments stored in the `test_parameter_type` variable.
-```Fortran
-use :: par_funnel
-type(arguments_presence_type) :: arg_pres
-arg_pres = arguments_presence([params(case)%presented("fmt"), &
-                               params(case)%presented("less_digits")])
-```
-
-Evaluate the value of the `arguments_presence` instance, i.e., the presence of optional arguments, and call the procedure considering it.
-```Fortran
-if (arg_pres .has. [.false., .false.]) &
-    act_string = int_to_str(input)
-if (arg_pres .has. [.true., .false.]) &
-    act_string = int_to_str(input, fmt)
-if (arg_pres .has. [.false., .true.]) &
-    act_string = int_to_str(input, less_digits=less_digits)
-if (arg_pres .has. [.true., .true.]) &
-    act_string = int_to_str(input, fmt, less_digits)
-```
-
-In the current implementaion, the `arguments_presence_type` is not necessary and can be substituted with an allocatable logical array. The `==` operator for logical arrays is also implemented for the use of logical arrays.
-```Fortran
-logical, allocatable :: arg_pres(:)
-
-...
-
-arg_pres = [params(case)%presented("fmt"), &
-            params(case)%presented("less_digits")]
-
-if (arg_pres == [.false., .false.]) &
-    act_string = int_to_str(input)
-if (arg_pres == [.true., .false.]) &
-    act_string = int_to_str(input, fmt)
-if (arg_pres == [.false., .true.]) &
-    act_string = int_to_str(input, less_digits=less_digits)
-if (arg_pres == [.true., .true.]) &
-    act_string = int_to_str(input, fmt, less_digits)
-```
-
-
-This approach produces more combinations when the number of optional arguments exceeds 2. Improvements and Efficient implementations are needed.
-
-#### note
-- `test_parameter_type` and `arguments_presence_type` can be handled together using `parameterization_spec_type`. An example can be found at `example/5.parameterizationSpec/parameterizationSpec.f90`.
-
-### handling results of test cases
-An example of the `test_results_type` for gathering parameterized test cases can be found at `example/3.testResults/results.f90`.
-
-A parameterized test is expected not to stop when a test under a condition fails and continues with the remaining conditions. In such a case, it is necessary to gather the results of each test case.
-
-The `test_results_type` is introduced to gather the results of a parameterized test. `test_results_type` must be declared as a variable and constructed according to `test_parameter_type`.
 ```Fortran
 use :: par_funnel
 
 type(test_parameter_type), allocatable :: params(:)
 type(test_results_type) :: results
+integer(int32) :: case, input, expected
 
-! construct test parameter and declare namelists
+! 1. describe arguments and expected results
+params = [ &
+         new_test_parameter(arguments='input=1', expected='output=2') &
+         , new_test_parameter(arguments='input=2', expected='output=4') &
+         ]
+results = new_test_results_for(params)
 
+do case = 1, results%get_number_of_test_cases()
+    ! 2. get the values by name
+    call params(case)%get("input", input)
+    call params(case)%get("output", expected)
+
+    ! 3. check the actual values
+    call results%check_equal(case, doublify(input), expected, &
+                             test_parameter=params(case), quantity="output")
+end do
+
+print *, results%get_summary_message()
+```
+
+When `doublify` has a bug, the output looks like the below. The failure message is composed automatically:
+
+```console
+ 1 test case(s) failed
+case 1: output: expected 2, but got 3 (arguments: input=1)
+```
+
+No user-side namelist declarations, read statements, or failure message compositions are needed. The complete example can be found at `example/1.testParameter/doublify.f90`.
+
+## Basic examples
+### test parameterization
+An example of test parameterization can be found at `example/1.testParameter/doublify.f90`.
+
+The `new_test_parameter` returns a `test_parameter_type` instance that contains the arguments and expected results described in strings:
+
+```Fortran
+type(test_parameter_type), allocatable :: params(:)
+params = [ &
+         new_test_parameter(arguments='input=1', expected='output=2') &
+         , new_test_parameter(arguments='input=2', expected='output=4') &
+         ]
+```
+
+`test_parameter_type%get()` reads a value by name from the arguments and expected results:
+
+```Fortran
+integer(int32) :: input, output
+
+call params(case)%get("input", input)
+call params(case)%get("output", output)
+```
+
+- Supported types are `integer(int32)`, `integer(int64)`, `real(real32)`, `real(real64)`, `logical`, and `character(:), allocatable` for scalars, and rank-1 arrays of the numeric and logical types. For other types, such as multi-dimensional arrays, see [user-declared namelists](#advanced-user-declared-namelists).
+- `get` searches the arguments first, then the expected results. When the same name exists in both, the optional argument `from` restricts the search: `call params(case)%get("less_digits", val, from="expected")`.
+- When the optional argument `found` is passed, `get` sets it to the presence status of the name and leaves the value unchanged if the name is not found. This is convenient for keeping a default value assigned in advance:
+
+```Fortran
+logical :: fmt_found
+character(:), allocatable :: fmt
+
+call params(case)%get("fmt", fmt, found=fmt_found)
+```
+
+- When `found` is not passed, and the name is not found, the program is terminated by `error stop` with a message. A malformed value always terminates the program with a message including the name and the value token.
+
+#### note
+- Values are described in the namelist format, `name=value`, separated by blank spaces, for example `new_test_parameter(arguments='input1=1 input2=2', expected="output=2")`.
+- Blank spaces at both sides of `=` are allowed: `arguments='input = 1'` and `arguments='input=1'` are equivalent. all `=` inside quoted strings are kept as they are.
+- Arrays are written like `arr=1, 2, 3`, optionally with repeat counts like `arr=2*7, 9`.
+- Par-funnel calls each parameterized test executed in a unit test a "test case."
+
+### work with optional arguments
+Fortran allows procedures to have optional arguments, and it is necessary to test all combinations of the optional arguments. An example can be found at `example/2.argumentsPresence/int2Str.f90`, which tests the function `int_to_str` having two optional arguments, `fmt` and `less_digits`:
+
+```Fortran
+function int_to_str(i32, fmt, less_digits) result(str)
+    integer(int32), intent(in) :: i32
+    character(*), intent(in), optional :: fmt
+    logical, intent(out), optional :: less_digits
+    character(:), allocatable :: str
+```
+
+Whether an argument is present in a test case can be checked by `test_parameter_type%presented()`. Based on it, `test_parameter_type%presence_pattern()` returns the presence statuses of up to 8 optional arguments in a string, so that the calls with the optional arguments can be branched in a `select case` construct instead of `if` statement chains:
+
+```Fortran
+select case (params(case)%presence_pattern("fmt", "less_digits"))
+case ("AA"); str = int_to_str(input)                            ! neither
+case ("PA"); str = int_to_str(input, fmt)                       ! fmt only
+case ("AP"); str = int_to_str(input, less_digits=less_digits)   ! less_digits only
+case ("PP"); str = int_to_str(input, fmt, less_digits)          ! both
+end select
+```
+
+The `i`-th character of the pattern is `P` when the `i`-th argument is present and `A` when absent, ordered as passed to `presence_pattern` (the 1st argument first). The case expressions are self-describing, requiring no constants, and the number of arguments scales naturally (for example, `"PAP"` for three arguments).
+
+`test_parameter_type%presence_index()` is the integer version, which converts the presence statuses into an index:
+
+| presence of `(fmt, less_digits)` | pattern | index |
+| :------------------------------- | :------ | ----: |
+| `(absent , absent )`             | `"AA"`  |     0 |
+| `(present, absent )`             | `"PA"`  |     1 |
+| `(absent , present)`             | `"AP"`  |     2 |
+| `(present, present)`             | `"PP"`  |     3 |
+
+The index is a bit pattern: the (`i-1`)th is set when the `i`-th argument is present. For two optional arguments, the constants `presence_AA`, `presence_PA`, `presence_AP`, and `presence_PP` name the indices:
+
+```Fortran
+select case (params(case)%presence_index("fmt", "less_digits"))
+case (presence_AA); str = int_to_str(input)
+case (presence_PA); str = int_to_str(input, fmt)
+case (presence_AP); str = int_to_str(input, less_digits=less_digits)
+case (presence_PP); str = int_to_str(input, fmt, less_digits)
+end select
+```
+
+Constants are provided only for two arguments because the number of combinations grows as 2^n; for three or more arguments, `presence_pattern` is recommended.
+
+### handling results of test cases
+`test_results_type` stores test case results. An example can be found at `example/3.testResults/results.f90`.
+
+`test_results_type` is constructed from the test parameters and refers only to the number of test cases:
+
+```Fortran
+type(test_results_type) :: results
 results = new_test_results_for(params)
 ```
 
-In the parameterized test loop, the test results are gathered by the type-bound procedure `check_test()` to pass a logical value representing the success/failure of a test case and a message corresponding to the test result.
+`test_results_type%check_equal()` compares an actual value with an expected value and stores the result with an automatically composed failure message:
+
 ```Fortran
-do case = 1, results%get_number_of_test_cases()
-    ! doing a test under a condition
-
-    if (.not. params(case)%presented("less_digits")) then
-        cond = (act_string == trim(exp_string))
-        message = ...
-    else
-        cond = (act_string == trim(exp_string)) .and. (less_digits .eqv. exp_less_digits)
-        message = ...
-    end if
-
-    call results%check_test(case, cond, message)
-end do
+call results%check_equal(case, actual, expected, &
+                         test_parameter=params(case), quantity="output")
 ```
 
-Some type-bound procedures, such as `get_number_of_failed_cases`, `all_cases_successful`, and `get_summary_message`, are available to confirm a kind of test summary.
-```Fortran
-if (results%get_number_of_failed_cases() > 0) then
-    print *, results%get_summary_message()
-    error stop
-end if
+A failure message looks like the below:
+
+```console
+output: expected 2, but got 3 (arguments: input=1)
 ```
 
-#### note
-In this example, all test cases will pass, and no message will be output. Replacing `cond` with `.false.` in the `check_test` forces all test cases to fail and message output.
+- Supported types are `integer(int32)`, `integer(int64)`, `real(real32)`, `real(real64)`, `logical`, and `character(*)`.
+- The real versions accept the optional argument `tolerance`. The values are compared using `|actual - expected| <= tolerance` when passed and exactly when not passed.
+- The optional arguments `test_parameter` and `quantity` enrich the failure message and can be omitted.
+- A condition evaluated by the user can also be stored with a user-composed message using `check_test(case, condition, message)`.
+
+`test_results_type` also provides procedures for summarizing the results, including `get_number_of_failed_cases()`, `all_cases_successful()`, and `get_summary_message()`.
+
+### loading test parameters from a file
+`load_test_parameters()` reads test parameters from an external namelist file, allowing test cases to be added or modified without recompilation. An example can be found at `example/8.namelistFile/namelistFile.f90`.
+
+```Fortran
+type(test_parameter_type), allocatable :: params(:)
+
+params = load_test_parameters("doublify_cases.nml")
+```
+
+The file consists of repeated `test_case` namelist groups. `case_name` is optional:
+
+```
+&test_case arguments='input=1', expected='output=2' /
+&test_case arguments='input=2', expected='output=4' /
+&test_case
+    arguments = 'input=-1'
+    expected  = 'output=-2'
+    case_name = 'negative input'
+/
+```
 
 ## collaboration with unit test frameworks
-Again I explain that par-funnel is not a unit test framework and is intended to be used in collaboration with other unit test frameworks. Par-funnel can work with a framework if it has an assertion procedure that takes a logical value meaning that a condition is satisfied or not, and an error message.
+Again, I explain that par-funnel is not a unit test framework and is intended to be used alongside other unit test frameworks. Par-funnel can work with a framework if it has an assertion procedure that takes a logical value indicating whether a condition is satisfied, and an error message.
 
-An example of collaboration with test-drive, a community-made unit test framework, can be found at `example/4.collabo/testdrive.f90`.
+An example of collaboration with test-drive, a community-made unit test framework, is available at `example/4.collabo/testdrive.f90`.
 
 A significant change from `example/3.testResults/results.f90` is to replace the checking results with a procedure call provided by test-drive.
 ```diff
-- if (results%get_number_of_failed_cases() > 0) then
--     print *, results%get_summary_message()
--     error stop
-- end if
+- print *, results%get_summary_message()
 + call check(error, results%all_cases_successful(), results%get_summary_message())
 ```
 
@@ -268,9 +282,47 @@ test_suite = [ &
              ]
 ```
 
-If a procedure under test has many arguments, the number of unit tests increases, and with it, the source code becomes more bloated and messy. In addition, it isn't easy, especially for non-native English speakers, to find proper names that include the procedure name under tests and test conditions under the 63-character limit. par-funnel can solve these problems.
+If a procedure under test has many arguments, the number of unit tests increases, and with it, the source code becomes more bloated and messy. In addition, it isn't easy, especially for non-native English speakers, to find proper names that include the procedure name under tests and test conditions under the 63-character limit. par-funnel can solve these problems: a single parameterized unit test covers all argument combinations, and each test case is reported with an automatically composed message.
 
-Parameterization of unit tests with par-funnel must be done manually and is more complicated than with other libraries, such as xUnit and pytest. It would be great if these could be improved.
+An example that uses `parameterization_spec_type`, which gathers the test parameters and the names of the optional arguments in one place, can be found in `example/5.parameterizationSpec/parameterizationSpec.f90`. An example that extends `test_parameter_type` and `parameterization_spec_type` to encapsulate the test setup can be found in `example/6.typeExtension`.
+
+## Advanced: user-declared namelists
+Internally, par-funnel stores the arguments and expected results as namelists. The simplified API shown above hides the namelists, but they are still accessible: declaring namelists by yourself allows using the full expressive power of the namelist feature, for example, **multi-dimensional arrays** and **character arrays**, which `get` does not support. An example can be found at `example/9.userDefinedNamelist/userDefinedNamelist.f90`.
+
+```Fortran
+type(test_parameter_type), allocatable :: params(:)
+
+params = [ &
+         new_test_parameter(arguments="matrix=1,2,3,4 label='2x2 sequential'", &
+                            expected="tr=5") &
+         ]
+```
+
+The namelist group names are fixed to `arguments` and `expected`. The values are read via the internal files `arguments_namelist` and `expected_namelist`:
+
+```Fortran
+integer(int32) :: matrix(2, 2)
+character(32) :: label
+namelist /arguments/ matrix, label
+
+read (unit=params(case)%arguments_namelist, nml=arguments)
+```
+
+User-declared namelists and the simplified API can be mixed freely. The example reads the rank-2 array with the user-declared namelist and still checks the results with `check_equal`.
+
+`arguments_presence_type` also remains available for those who prefer checking the presence patterns with the `.has.` operator:
+
+```Fortran
+type(arguments_presence_type) :: arg_pres
+
+arg_pres = arguments_presence([params(case)%presented("fmt"), &
+                               params(case)%presented("less_digits")])
+
+if (arg_pres .has. [.false., .false.]) str = int_to_str(input)
+if (arg_pres .has. [.true., .false.]) str = int_to_str(input, fmt)
+```
+
+Its `as_pattern()` and `as_index()` return the same pattern and index as `presence_pattern()` and `presence_index()` for use in a `select case` construct.
 
 ### API Document
 The API documentation can be generated using [FORD](https://github.com/Fortran-FOSS-Programmers/ford).
