@@ -6,6 +6,7 @@ module test_testParameter_collection
     use :: test_testParameter_unitTests_presented
     use :: test_testParameter_unitTests_newTestParameter
     use :: test_testParameter_unitTests_get
+    use :: test_testParameter_unitTests_presenceIndex
     implicit none
     private
     public :: collect_testParameter
@@ -48,6 +49,8 @@ contains
                                     get_should_read_values_written_with_spaces_around_equals) &
                      , new_unittest("get(), it should read quoted and unquoted strings.", &
                                     get_should_read_quoted_and_unquoted_strings) &
+                     , new_unittest("presence_index(), it should return the bit pattern of presence statuses.", &
+                                    presenceIndex_should_return_bit_pattern_of_presence_statuses) &
                      ]
     end subroutine collect_testParameter
 end module test_testParameter_collection
