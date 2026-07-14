@@ -6,6 +6,7 @@ module test_testParameter_unitTests_presenceIndex
     implicit none
     private
     public :: presenceIndex_should_return_bit_pattern_of_presence_statuses
+    public :: presenceConstants_should_correspond_to_two_argument_indices
 
 contains
     subroutine presenceIndex_should_return_bit_pattern_of_presence_statuses(error)
@@ -31,4 +32,20 @@ contains
             if (occurred(error)) return
         end do
     end subroutine presenceIndex_should_return_bit_pattern_of_presence_statuses
+
+    subroutine presenceConstants_should_correspond_to_two_argument_indices(error)
+        implicit none
+        type(error_type), allocatable, intent(out) :: error
+            !! error handler
+
+        call check(error, presence_AA == 0, "presence_AA should be 0")
+        if (occurred(error)) return
+        call check(error, presence_PA == 1, "presence_PA should be 1")
+        if (occurred(error)) return
+        call check(error, presence_AP == 2, "presence_AP should be 2")
+        if (occurred(error)) return
+        call check(error, presence_PP == 3, "presence_PP should be 3")
+        if (occurred(error)) return
+    end subroutine presenceConstants_should_correspond_to_two_argument_indices
+
 end module test_testParameter_unitTests_presenceIndex
