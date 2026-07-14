@@ -7,6 +7,7 @@ module test_testParameter_collection
     use :: test_testParameter_unitTests_newTestParameter
     use :: test_testParameter_unitTests_get
     use :: test_testParameter_unitTests_presenceIndex
+    use :: test_testParameter_unitTests_presencePattern
     implicit none
     private
     public :: collect_testParameter
@@ -51,6 +52,10 @@ contains
                                     get_should_read_quoted_and_unquoted_strings) &
                      , new_unittest("presence_index(), it should return the bit pattern of presence statuses.", &
                                     presenceIndex_should_return_bit_pattern_of_presence_statuses) &
+                     , new_unittest("presence constants, they should correspond to the two-argument indices.", &
+                                    presenceConstants_should_correspond_to_two_argument_indices) &
+                     , new_unittest("presence_pattern(), it should return the string of presence statuses.", &
+                                    presencePattern_should_return_string_of_presence_statuses) &
                      ]
     end subroutine collect_testParameter
 end module test_testParameter_collection

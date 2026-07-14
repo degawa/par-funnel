@@ -67,12 +67,17 @@ contains
             ! the presence statuses of the optional arguments declared in the spec
             ! are converted into an index by `as_index`,
             ! which is equivalent to `param%presence_index("fmt", "less_digits")`.
+            ! The constants presence_AA/PA/AP/PP name the indices for
+            ! two optional arguments (A: absent, P: present, ordered as declared).
+            ! For three or more arguments, the number of constants grows as 2^n;
+            ! consider `as_pattern`/`presence_pattern`, which return the statuses
+            ! in a string such as "PAP" and require no constants.
             arg_pres = spec%get_optional_arguments_presence_in(case)
             select case (arg_pres%as_index())
-            case (0); act_string = int_to_str(input)
-            case (1); act_string = int_to_str(input, fmt)
-            case (2); act_string = int_to_str(input, less_digits=act_less_digits)
-            case (3); act_string = int_to_str(input, fmt, act_less_digits)
+            case (presence_AA); act_string = int_to_str(input)
+            case (presence_PA); act_string = int_to_str(input, fmt)
+            case (presence_AP); act_string = int_to_str(input, less_digits=act_less_digits)
+            case (presence_PP); act_string = int_to_str(input, fmt, act_less_digits)
             end select
 
             if (param%presented("less_digits")) then

@@ -35,6 +35,10 @@ module type_testParameter
         procedure, public, pass :: presence_index
         !* gets an index computed from the presence statuses of optional arguments,
         ! intended to be used in a `select case` construct
+        procedure, public, pass :: presence_pattern
+        !* gets the presence statuses of optional arguments in a string
+        ! such as "PA" (P: present, A: absent),
+        ! intended to be used in a `select case` construct
 
         procedure, private, pass :: get_int32
         procedure, private, pass :: get_int64
@@ -77,6 +81,41 @@ module type_testParameter
         !! namelist group name for the arguments
     character(*), private, parameter :: expected_group_name = "expected"
         !! namelist group name for the expected results
+
+    !>Presence indices for **two** optional arguments,
+    !>returned by `presence_index` of `test_parameter_type`
+    !>and `as_index` of `arguments_presence_type`.
+    !>
+    !>The letter `A` means absent and `P` means present,
+    !>ordered as the arguments (the 1st argument first):
+    !>`presence_PA` means that the 1st argument is present
+    !>and the 2nd argument is absent.
+    !>
+    !>```Fortran
+    !>select case (params(case)%presence_index("fmt", "less_digits"))
+    !>case (presence_AA); str = int_to_str(input)
+    !>case (presence_PA); str = int_to_str(input, fmt)
+    !>case (presence_AP); str = int_to_str(input, less_digits=less_digits)
+    !>case (presence_PP); str = int_to_str(input, fmt, less_digits)
+    !>end select
+    !>```
+    !>
+    !>@note
+    !>The constants are provided only for two optional arguments
+    !>because the number of combinations grows as 2^n
+    !>as the number of arguments increases.
+    !>For three or more arguments, consider using `presence_pattern`,
+    !>which returns the presence statuses in a string such as `"PAP"`
+    !>and requires no constants.
+    !>@endnote
+    integer(int32), public, parameter :: presence_AA = 0
+        !! both the 1st and 2nd optional arguments are absent
+    integer(int32), public, parameter :: presence_PA = 1
+        !! the 1st optional argument is present and the 2nd is absent
+    integer(int32), public, parameter :: presence_AP = 2
+        !! the 1st optional argument is absent and the 2nd is present
+    integer(int32), public, parameter :: presence_PP = 3
+        !! both the 1st and 2nd optional arguments are present
 
 contains
     !>returns a new `test_parameter_type` instance.
@@ -154,12 +193,18 @@ contains
     !>
     !>```Fortran
     !>select case (params(case)%presence_index("fmt", "less_digits"))
-    !>case (0); act = int_to_str(input)
-    !>case (1); act = int_to_str(input, fmt)
-    !>case (2); act = int_to_str(input, less_digits=less_digits)
-    !>case (3); act = int_to_str(input, fmt, less_digits)
+    !>case (presence_AA); act = int_to_str(input)
+    !>case (presence_PA); act = int_to_str(input, fmt)
+    !>case (presence_AP); act = int_to_str(input, less_digits=less_digits)
+    !>case (presence_PP); act = int_to_str(input, fmt, less_digits)
     !>end select
     !>```
+    !>
+    !>The constants `presence_AA`, `presence_PA`, `presence_AP`, and `presence_PP`
+    !>are provided for two optional arguments.
+    !>For three or more arguments, consider using `presence_pattern`,
+    !>which returns the presence statuses in a string such as `"PAP"`
+    !>and requires no constants.
     pure function presence_index(this, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8) result(idx)
         implicit none
         class(test_parameter_type), intent(in) :: this
@@ -207,6 +252,79 @@ contains
             if (this%presented(arg8)) idx = idx + 128
         end if
     end function presence_index
+
+    !>returns the presence statuses of up to 8 optional arguments
+    !>in a string, in that the `i`-th character is `P`
+    !>when the `i`-th argument is present and `A` when absent:
+    !>
+    !>| presence of `(arg1, arg2)` | pattern |
+    !>| :------------------------- | :------ |
+    !>| `(absent , absent )`       | `"AA"`  |
+    !>| `(present, absent )`       | `"PA"`  |
+    !>| `(absent , present)`       | `"AP"`  |
+    !>| `(present, present)`       | `"PP"`  |
+    !>
+    !>The intended use is to branch procedure calls with optional arguments
+    !>in a `select case` construct.
+    !>The case expressions are self-describing, requiring no constants,
+    !>and the number of arguments scales without defining 2^n constants:
+    !>
+    !>```Fortran
+    !>select case (params(case)%presence_pattern("fmt", "less_digits"))
+    !>case ("AA"); str = int_to_str(input)
+    !>case ("PA"); str = int_to_str(input, fmt)
+    !>case ("AP"); str = int_to_str(input, less_digits=less_digits)
+    !>case ("PP"); str = int_to_str(input, fmt, less_digits)
+    !>end select
+    !>```
+    pure function presence_pattern(this, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8) result(pattern)
+        implicit none
+        class(test_parameter_type), intent(in) :: this
+            !! passed dummy argument
+        character(*), intent(in) :: arg1
+            !! the name of the 1st optional argument
+        character(*), intent(in), optional :: arg2
+            !! the name of the 2nd optional argument
+        character(*), intent(in), optional :: arg3
+            !! the name of the 3rd optional argument
+        character(*), intent(in), optional :: arg4
+            !! the name of the 4th optional argument
+        character(*), intent(in), optional :: arg5
+            !! the name of the 5th optional argument
+        character(*), intent(in), optional :: arg6
+            !! the name of the 6th optional argument
+        character(*), intent(in), optional :: arg7
+            !! the name of the 7th optional argument
+        character(*), intent(in), optional :: arg8
+            !! the name of the 8th optional argument
+        character(:), allocatable :: pattern
+            !! the presence statuses in a string (P: present, A: absent)
+
+        pattern = a_or_p(this%presented(arg1))
+        if (present(arg2)) pattern = pattern//a_or_p(this%presented(arg2))
+        if (present(arg3)) pattern = pattern//a_or_p(this%presented(arg3))
+        if (present(arg4)) pattern = pattern//a_or_p(this%presented(arg4))
+        if (present(arg5)) pattern = pattern//a_or_p(this%presented(arg5))
+        if (present(arg6)) pattern = pattern//a_or_p(this%presented(arg6))
+        if (present(arg7)) pattern = pattern//a_or_p(this%presented(arg7))
+        if (present(arg8)) pattern = pattern//a_or_p(this%presented(arg8))
+    end function presence_pattern
+
+    !>returns `"P"` when the presence status is `.true.`
+    !>and `"A"` otherwise.
+    pure function a_or_p(presented) result(letter)
+        implicit none
+        logical, intent(in) :: presented
+            !! the presence status
+        character(1) :: letter
+            !! `"P"` for present or `"A"` for absent
+
+        if (presented) then
+            letter = "P"
+        else
+            letter = "A"
+        end if
+    end function a_or_p
 
     !>returns the arguments in a string,
     !>not including the namelist keywords

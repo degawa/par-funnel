@@ -30,6 +30,11 @@ module type_argumentsPresence
         !* gets the presence statuses as an index (bit pattern),
         ! intended to be used in a `select case` construct
 
+        procedure, public, pass :: as_pattern
+        !* gets the presence statuses in a string such as "PA"
+        ! (P: present, A: absent),
+        ! intended to be used in a `select case` construct
+
         procedure, public, pass :: eqv_type
         !* gets the equality between a `arguments_presence_type` and a `arguments_presence_type`
         procedure, public, pass :: eqv_logical
@@ -163,6 +168,41 @@ contains
             if (this%presented(i)) idx = idx + 2**(i - 1)
         end do
     end function as_index
+
+    !>returns the presence statuses in a string,
+    !>in that the `i`-th character is `P` when the `i`-th status is `.true.`
+    !>and `A` when `.false.`:
+    !>
+    !>| `presented`          | pattern |
+    !>| :------------------- | :------ |
+    !>| `[.false., .false.]` | `"AA"`  |
+    !>| `[.true. , .false.]` | `"PA"`  |
+    !>| `[.false., .true. ]` | `"AP"`  |
+    !>| `[.true. , .true. ]` | `"PP"`  |
+    !>
+    !>The intended use is to branch procedure calls with optional arguments
+    !>in a `select case` construct.
+    !>The case expressions are self-describing, requiring no constants,
+    !>and the number of arguments scales without defining 2^n constants.
+    !>Returns an empty string when the instance is not initialized.
+    pure function as_pattern(this) result(pattern)
+        implicit none
+        class(arguments_presence_type), intent(in) :: this
+            !! passed dummy argument
+        character(:), allocatable :: pattern
+            !! the presence statuses in a string (P: present, A: absent)
+
+        integer(int32) :: i
+
+        pattern = ""
+        do i = 1, this%get_number_of_presence_statuses()
+            if (this%presented(i)) then
+                pattern = pattern//"P"
+            else
+                pattern = pattern//"A"
+            end if
+        end do
+    end function as_pattern
 
     !>returns `.true.` if all the values of component `presented`
     !>are equivalent and `.false.` otherwise.

@@ -8,6 +8,7 @@ module test_argumentsPresence_collection
     use :: test_argumentsPresence_unitTests_get
     use :: test_argumentsPresence_unitTests_asString
     use :: test_argumentsPresence_unitTests_asIndex
+    use :: test_argumentsPresence_unitTests_asPattern
     implicit none
     private
     public :: collect_argumentsPresence
@@ -25,6 +26,7 @@ contains
         type(unittest_type), allocatable :: test_suite_get(:)
         type(unittest_type), allocatable :: test_suite_asStr(:)
         type(unittest_type), allocatable :: test_suite_asIdx(:)
+        type(unittest_type), allocatable :: test_suite_asPattern(:)
 
         test_suite_ll = [ &
                         new_unittest("eqv_logical_logical(), it should return true "// &
@@ -189,6 +191,10 @@ contains
                            new_unittest("as_index(), it should return the bit pattern of presence statuses.", &
                                         asIndex_should_return_bit_pattern_of_presence_statuses) &
                            ]
+        test_suite_asPattern = [ &
+                               new_unittest("as_pattern(), it should return the string of presence statuses.", &
+                                            asPattern_should_return_string_of_presence_statuses) &
+                               ]
 
         test_suite = [test_suite_ll, test_suite_tl, test_suite_lt, test_suite_tt &
                       , new_unittest("argumets_presence(), "// &

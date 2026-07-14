@@ -71,15 +71,17 @@ program main
             call params(case)%get("fmt", fmt, found=fmt_found)
             call params(case)%get("string", exp_string)
 
-            ! `presence_index` converts the presence statuses of the optional
-            ! arguments into an index (bit pattern: fmt -> bit 0, less_digits -> bit 1),
+            ! `presence_pattern` returns the presence statuses of the optional
+            ! arguments in a string (P: present, A: absent, ordered as passed:
+            ! fmt -> 1st letter, less_digits -> 2nd letter),
             ! so that the calls with the optional arguments can be branched
             ! in a `select case` construct instead of `if` statement chains.
-            select case (params(case)%presence_index("fmt", "less_digits"))
-            case (0); act_string = int_to_str(input)
-            case (1); act_string = int_to_str(input, fmt)
-            case (2); act_string = int_to_str(input, less_digits=act_less_digits)
-            case (3); act_string = int_to_str(input, fmt, act_less_digits)
+            ! The case expressions are self-describing, requiring no constants.
+            select case (params(case)%presence_pattern("fmt", "less_digits"))
+            case ("AA"); act_string = int_to_str(input)
+            case ("PA"); act_string = int_to_str(input, fmt)
+            case ("AP"); act_string = int_to_str(input, less_digits=act_less_digits)
+            case ("PP"); act_string = int_to_str(input, fmt, act_less_digits)
             end select
 
             if (params(case)%presented("less_digits")) then
