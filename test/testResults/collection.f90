@@ -5,6 +5,7 @@ module test_testResults_collection
     use :: test_testResults_unitTests_getStatus
     use :: test_testResults_unitTests_getMessage
     use :: test_testResults_unitTests_newTestResults
+    use :: test_testResults_unitTests_checkEqual
     implicit none
     private
     public :: collect_testResults
@@ -68,6 +69,14 @@ contains
                      , new_unittest("new_test_results_for(parameterization_spec), "// &
                                     "it should return a 'test_results_type' instance with the same num of results as test cases.", &
                                     newTestResSpec_should_return_instance_with_same_num_as_cases) &
+                     , new_unittest("check_equal(), it should store success when values are equal.", &
+                                    checkEqual_should_store_success_when_values_are_equal) &
+                     , new_unittest("check_equal(), it should compose a failure message automatically.", &
+                                    checkEqual_should_compose_failure_message_automatically) &
+                     , new_unittest("check_equal(), it should compare reals based on the tolerance.", &
+                                    checkEqual_should_compare_reals_based_on_tolerance) &
+                     , new_unittest("check_equal(), it should compare logical and character values.", &
+                                    checkEqual_should_compare_logical_and_character_values) &
                      ]
     end subroutine collect_testResults
 end module test_testResults_collection
