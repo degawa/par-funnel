@@ -17,6 +17,7 @@ sort: permission-alpha
 search: true
 source: false
 extra_mods: iso_fortran_env: https://gcc.gnu.org/onlinedocs/gfortran/ISO_005fFORTRAN_005fENV.html
+            iso_c_binding: https://gcc.gnu.org/onlinedocs/gfortran/ISO_005fC_005fBINDING.html
 graph: true
 coloured_edges: true
 print_creation_date: true
