@@ -32,6 +32,9 @@ module type_testParameter
 
         procedure, public, pass :: presented
         !* checks for the presence of an argument
+        procedure, public, pass :: presence_index
+        !* gets an index computed from the presence statuses of optional arguments,
+        ! intended to be used in a `select case` construct
 
         procedure, private, pass :: get_int32
         procedure, private, pass :: get_int64
@@ -132,6 +135,78 @@ contains
 
         call find_value_token(this%arguments_namelist, argument, token, presented)
     end function presented
+
+    !>returns an index computed from the presence statuses
+    !>of up to 8 optional arguments.
+    !>
+    !>The index is a bit pattern in that the bit `i-1` is set
+    !>when the `i`-th argument is present in the arguments namelist:
+    !>
+    !>| presence of `(arg1, arg2)` | index |
+    !>| :------------------------- | ----: |
+    !>| `(absent , absent )`       |     0 |
+    !>| `(present, absent )`       |     1 |
+    !>| `(absent , present)`       |     2 |
+    !>| `(present, present)`       |     3 |
+    !>
+    !>The intended use is to branch procedure calls with optional arguments
+    !>in a `select case` construct instead of `if` statement chains:
+    !>
+    !>```Fortran
+    !>select case (params(case)%presence_index("fmt", "less_digits"))
+    !>case (0); act = int_to_str(input)
+    !>case (1); act = int_to_str(input, fmt)
+    !>case (2); act = int_to_str(input, less_digits=less_digits)
+    !>case (3); act = int_to_str(input, fmt, less_digits)
+    !>end select
+    !>```
+    pure function presence_index(this, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8) result(idx)
+        implicit none
+        class(test_parameter_type), intent(in) :: this
+            !! passed dummy argument
+        character(*), intent(in) :: arg1
+            !! the name of the 1st optional argument
+        character(*), intent(in), optional :: arg2
+            !! the name of the 2nd optional argument
+        character(*), intent(in), optional :: arg3
+            !! the name of the 3rd optional argument
+        character(*), intent(in), optional :: arg4
+            !! the name of the 4th optional argument
+        character(*), intent(in), optional :: arg5
+            !! the name of the 5th optional argument
+        character(*), intent(in), optional :: arg6
+            !! the name of the 6th optional argument
+        character(*), intent(in), optional :: arg7
+            !! the name of the 7th optional argument
+        character(*), intent(in), optional :: arg8
+            !! the name of the 8th optional argument
+        integer(int32) :: idx
+            !! the index computed from the presence statuses
+
+        idx = 0
+        if (this%presented(arg1)) idx = idx + 1
+        if (present(arg2)) then
+            if (this%presented(arg2)) idx = idx + 2
+        end if
+        if (present(arg3)) then
+            if (this%presented(arg3)) idx = idx + 4
+        end if
+        if (present(arg4)) then
+            if (this%presented(arg4)) idx = idx + 8
+        end if
+        if (present(arg5)) then
+            if (this%presented(arg5)) idx = idx + 16
+        end if
+        if (present(arg6)) then
+            if (this%presented(arg6)) idx = idx + 32
+        end if
+        if (present(arg7)) then
+            if (this%presented(arg7)) idx = idx + 64
+        end if
+        if (present(arg8)) then
+            if (this%presented(arg8)) idx = idx + 128
+        end if
+    end function presence_index
 
     !>returns the arguments in a string,
     !>not including the namelist keywords

@@ -26,6 +26,10 @@ module type_argumentsPresence
         procedure, public, pass :: as_string
         !* gets the presentce statuses in a string
 
+        procedure, public, pass :: as_index
+        !* gets the presence statuses as an index (bit pattern),
+        ! intended to be used in a `select case` construct
+
         procedure, public, pass :: eqv_type
         !* gets the equality between a `arguments_presence_type` and a `arguments_presence_type`
         procedure, public, pass :: eqv_logical
@@ -131,6 +135,34 @@ contains
         end do
         str = str//" ]"
     end function as_string
+
+    !>returns the presence statuses as an index (bit pattern)
+    !>in that the bit `i-1` is set when the `i`-th status is `.true.`:
+    !>
+    !>| `presented`          | index |
+    !>| :------------------- | ----: |
+    !>| `[.false., .false.]` |     0 |
+    !>| `[.true. , .false.]` |     1 |
+    !>| `[.false., .true. ]` |     2 |
+    !>| `[.true. , .true. ]` |     3 |
+    !>
+    !>The intended use is to branch procedure calls with optional arguments
+    !>in a `select case` construct instead of `if` statement chains.
+    !>Returns 0 when the instance is not initialized.
+    pure function as_index(this) result(idx)
+        implicit none
+        class(arguments_presence_type), intent(in) :: this
+            !! passed dummy argument
+        integer(int32) :: idx
+            !! the presence statuses as a bit pattern
+
+        integer(int32) :: i
+
+        idx = 0
+        do i = 1, this%get_number_of_presence_statuses()
+            if (this%presented(i)) idx = idx + 2**(i - 1)
+        end do
+    end function as_index
 
     !>returns `.true.` if all the values of component `presented`
     !>are equivalent and `.false.` otherwise.
