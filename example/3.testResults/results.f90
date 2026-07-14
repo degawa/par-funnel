@@ -83,9 +83,9 @@ contains
             call params(case)%get("fmt", fmt, found=fmt_found)
             call params(case)%get("string", exp_string)
 
-            select case (params(case)%presence_index("fmt"))
-            case (0); act_string = int_to_str(input)
-            case (1); act_string = int_to_str(input, fmt)
+            select case (params(case)%presence_pattern("fmt"))
+            case ("A"); act_string = int_to_str(input)
+            case ("P"); act_string = int_to_str(input, fmt)
             end select
 
             ! `check_equal` stores the comparison result to `results`

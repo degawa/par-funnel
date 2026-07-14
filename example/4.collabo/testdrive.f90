@@ -55,11 +55,11 @@ contains
                 call params(case)%get("fmt", fmt, found=fmt_found)
                 call params(case)%get("string", exp_string)
 
-                select case (params(case)%presence_index("fmt", "less_digits"))
-                case (0); act_string = int_to_str(input)
-                case (1); act_string = int_to_str(input, fmt)
-                case (2); act_string = int_to_str(input, less_digits=act_less_digits)
-                case (3); act_string = int_to_str(input, fmt, act_less_digits)
+                select case (params(case)%presence_pattern("fmt", "less_digits"))
+                case ("AA"); act_string = int_to_str(input)
+                case ("PA"); act_string = int_to_str(input, fmt)
+                case ("AP"); act_string = int_to_str(input, less_digits=act_less_digits)
+                case ("PP"); act_string = int_to_str(input, fmt, act_less_digits)
                 end select
 
                 if (params(case)%presented("less_digits")) then
