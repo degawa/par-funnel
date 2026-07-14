@@ -7,6 +7,8 @@ module doublifyParameterizationSpec
     public :: new_doublify_parameterization_spec
     public :: new_doublify_test_parameter
 
+    !>An extension of `parameterization_spec_type`
+    !>that runs the test cases by itself.
     type, public, extends(parameterization_spec_type) :: doublify_parameterization_spec_type
     contains
         final :: finalize
@@ -65,9 +67,10 @@ contains
                 call param%setup()
 
                 ! run the procedure under test with a parameter
-                ! and check the result
+                ! and check the result with an automatically composed failure message
                 actual = doublify(param%input)
-                call results%check_test(case, actual == param%output, param%failure_message(actual=actual))
+                call results%check_equal(case, actual, param%output, &
+                                         test_parameter=param, quantity="output")
 
                 call param%teardown()
             end select

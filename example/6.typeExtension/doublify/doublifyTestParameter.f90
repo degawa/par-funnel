@@ -5,6 +5,9 @@ module doublifyTestParameter
     private
     public :: new_doublify_test_parameter
 
+    !>An extension of `test_parameter_type` that holds
+    !>the arguments and expected results as components.
+    !>`setup` is overridden to read the values from the namelists.
     type, public, extends(test_parameter_type) :: doublify_test_parameter_type
         integer(int32), public :: input
         integer(int32), public :: output
@@ -12,8 +15,6 @@ module doublifyTestParameter
         procedure, public, pass :: setup
         procedure, public, pass :: teardown
         final :: finalize
-
-        procedure, public, pass :: failure_message
     end type doublify_test_parameter_type
 
     type(doublify_test_parameter_type), public :: doublify_test_parameter_type_mold
@@ -35,21 +36,14 @@ contains
         call test_parameter%construct(arguments, expected)
     end function construct_doublify_test_parameter
 
+    !>reads the arguments and expected results into the components
+    !>using the simplified API `get`.
     subroutine setup(this)
         implicit none
         class(doublify_test_parameter_type), intent(inout) :: this
 
-        integer(int32) :: input, output
-        namelist /arguments/ input
-        namelist /expected/ output
-
-        ! arguments for the procedure under test
-        read (unit=this%arguments_namelist, nml=arguments)
-        this%input = input
-
-        ! expected results
-        read (unit=this%expected_namelist, nml=expected)
-        this%output = output
+        call this%get("input", this%input)
+        call this%get("output", this%output)
 
         this%case_name = "doublify(input) should return "//this%expected()// &
                          " when input "//this%arguments()
@@ -64,7 +58,7 @@ contains
 
     !>finalize the `doublify_test_parameter_type` instance
     !>by deallocating components
-    !>expected_namelist` and `expected_namelist`
+    !>`arguments_namelist` and `expected_namelist`
     pure subroutine finalize(this)
         implicit none
         type(doublify_test_parameter_type), intent(inout) :: this
@@ -75,16 +69,4 @@ contains
         if (allocated(this%arguments_namelist)) deallocate (this%arguments_namelist)
         if (allocated(this%expected_namelist)) deallocate (this%expected_namelist)
     end subroutine finalize
-
-    function failure_message(this, actual) result(msg)
-        use :: testdrive, only:to_string
-        implicit none
-        class(doublify_test_parameter_type), intent(in) :: this
-        integer(int32), intent(in) :: actual
-        character(:), allocatable :: msg
-
-        msg = this%case_name//new_line_char// &
-              "    expected : "//to_string(this%output)//new_line_char// &
-              "    actual   : "//to_string(actual)
-    end function failure_message
 end module doublifyTestParameter
