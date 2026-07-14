@@ -54,6 +54,18 @@ module type_testResults
         procedure, public, pass :: check_test
         !* checks the result of the conditional formula in a test case
 
+        procedure, private, pass :: check_equal_int32
+        procedure, private, pass :: check_equal_int64
+        procedure, private, pass :: check_equal_real32
+        procedure, private, pass :: check_equal_real64
+        procedure, private, pass :: check_equal_logical
+        procedure, private, pass :: check_equal_char
+        generic, public :: check_equal => check_equal_int32, check_equal_int64, &
+            check_equal_real32, check_equal_real64, &
+            check_equal_logical, check_equal_char
+        !* compares an actual value with an expected value
+        ! and stores the result with an automatically composed failure message
+
         procedure, public, pass :: get_number_of_test_cases
         !* gets the number of test cases
         procedure, public, pass :: get_number_of_failed_cases
@@ -168,6 +180,272 @@ contains
         this%test(case)%success_status = condition
         this%test(case)%failure_message = message
     end subroutine check_test
+
+    !------------------------------------------------------------------!
+    ! check_equal
+    !
+    ! The check_equal procedures compare an actual value
+    ! with an expected value and store the result of a test case
+    ! with an automatically composed failure message like
+    !
+    !     output: expected 2, but got 3 (arguments: input=1)
+    !
+    ! so that users do not need to compose failure messages.
+    !------------------------------------------------------------------!
+
+    !>compares `integer(int32)` values and stores the result of a test case
+    !>with an automatically composed failure message.
+    pure subroutine check_equal_int32(this, case, actual, expected, test_parameter, quantity)
+        use :: type_testParameter
+        implicit none
+        class(test_results_type), intent(inout) :: this
+            !! passed dummy argument
+        integer(int32), intent(in) :: case
+            !! a test case number
+        integer(int32), intent(in) :: actual
+            !! the actual value
+        integer(int32), intent(in) :: expected
+            !! the expected value
+        class(test_parameter_type), intent(in), optional :: test_parameter
+            !! the test parameter of the test case.
+            !! the arguments are appended to the failure message when passed
+        character(*), intent(in), optional :: quantity
+            !! the name of the quantity to be checked.
+            !! prepended to the failure message when passed
+
+        call store_result(this, case, (actual == expected), &
+                          to_string(actual), to_string(expected), &
+                          arguments_in(test_parameter), quantity)
+    end subroutine check_equal_int32
+
+    !>compares `integer(int64)` values and stores the result of a test case
+    !>with an automatically composed failure message.
+    pure subroutine check_equal_int64(this, case, actual, expected, test_parameter, quantity)
+        use :: type_testParameter
+        implicit none
+        class(test_results_type), intent(inout) :: this
+            !! passed dummy argument
+        integer(int32), intent(in) :: case
+            !! a test case number
+        integer(int64), intent(in) :: actual
+            !! the actual value
+        integer(int64), intent(in) :: expected
+            !! the expected value
+        class(test_parameter_type), intent(in), optional :: test_parameter
+            !! the test parameter of the test case.
+            !! the arguments are appended to the failure message when passed
+        character(*), intent(in), optional :: quantity
+            !! the name of the quantity to be checked.
+            !! prepended to the failure message when passed
+
+        character(32) :: act_buf, exp_buf
+
+        write (act_buf, '(I0)') actual
+        write (exp_buf, '(I0)') expected
+        call store_result(this, case, (actual == expected), &
+                          trim(act_buf), trim(exp_buf), &
+                          arguments_in(test_parameter), quantity)
+    end subroutine check_equal_int64
+
+    !>compares `real(real32)` values and stores the result of a test case
+    !>with an automatically composed failure message.
+    !>
+    !>The values are compared exactly when `tolerance` is not passed
+    !>and compared based on `|actual - expected| <= tolerance` when passed.
+    pure subroutine check_equal_real32(this, case, actual, expected, test_parameter, quantity, tolerance)
+        use :: type_testParameter
+        implicit none
+        class(test_results_type), intent(inout) :: this
+            !! passed dummy argument
+        integer(int32), intent(in) :: case
+            !! a test case number
+        real(real32), intent(in) :: actual
+            !! the actual value
+        real(real32), intent(in) :: expected
+            !! the expected value
+        class(test_parameter_type), intent(in), optional :: test_parameter
+            !! the test parameter of the test case.
+            !! the arguments are appended to the failure message when passed
+        character(*), intent(in), optional :: quantity
+            !! the name of the quantity to be checked.
+            !! prepended to the failure message when passed
+        real(real32), intent(in), optional :: tolerance
+            !! the tolerance of the comparison
+
+        logical :: condition
+        character(32) :: act_buf, exp_buf
+
+        if (present(tolerance)) then
+            condition = (abs(actual - expected) <= tolerance)
+        else
+            condition = (actual == expected)
+        end if
+
+        write (act_buf, '(g0)') actual
+        write (exp_buf, '(g0)') expected
+        call store_result(this, case, condition, &
+                          trim(act_buf), trim(exp_buf), &
+                          arguments_in(test_parameter), quantity)
+    end subroutine check_equal_real32
+
+    !>compares `real(real64)` values and stores the result of a test case
+    !>with an automatically composed failure message.
+    !>
+    !>The values are compared exactly when `tolerance` is not passed
+    !>and compared based on `|actual - expected| <= tolerance` when passed.
+    pure subroutine check_equal_real64(this, case, actual, expected, test_parameter, quantity, tolerance)
+        use :: type_testParameter
+        implicit none
+        class(test_results_type), intent(inout) :: this
+            !! passed dummy argument
+        integer(int32), intent(in) :: case
+            !! a test case number
+        real(real64), intent(in) :: actual
+            !! the actual value
+        real(real64), intent(in) :: expected
+            !! the expected value
+        class(test_parameter_type), intent(in), optional :: test_parameter
+            !! the test parameter of the test case.
+            !! the arguments are appended to the failure message when passed
+        character(*), intent(in), optional :: quantity
+            !! the name of the quantity to be checked.
+            !! prepended to the failure message when passed
+        real(real64), intent(in), optional :: tolerance
+            !! the tolerance of the comparison
+
+        logical :: condition
+        character(32) :: act_buf, exp_buf
+
+        if (present(tolerance)) then
+            condition = (abs(actual - expected) <= tolerance)
+        else
+            condition = (actual == expected)
+        end if
+
+        write (act_buf, '(g0)') actual
+        write (exp_buf, '(g0)') expected
+        call store_result(this, case, condition, &
+                          trim(act_buf), trim(exp_buf), &
+                          arguments_in(test_parameter), quantity)
+    end subroutine check_equal_real64
+
+    !>compares `logical` values and stores the result of a test case
+    !>with an automatically composed failure message.
+    pure subroutine check_equal_logical(this, case, actual, expected, test_parameter, quantity)
+        use :: type_testParameter
+        implicit none
+        class(test_results_type), intent(inout) :: this
+            !! passed dummy argument
+        integer(int32), intent(in) :: case
+            !! a test case number
+        logical, intent(in) :: actual
+            !! the actual value
+        logical, intent(in) :: expected
+            !! the expected value
+        class(test_parameter_type), intent(in), optional :: test_parameter
+            !! the test parameter of the test case.
+            !! the arguments are appended to the failure message when passed
+        character(*), intent(in), optional :: quantity
+            !! the name of the quantity to be checked.
+            !! prepended to the failure message when passed
+
+        call store_result(this, case, (actual .eqv. expected), &
+                          logical_to_string(actual), logical_to_string(expected), &
+                          arguments_in(test_parameter), quantity)
+    end subroutine check_equal_logical
+
+    !>compares character values and stores the result of a test case
+    !>with an automatically composed failure message.
+    !>
+    !>The comparison follows the `==` operator for characters,
+    !>that is, the shorter one is padded with trailing blanks.
+    pure subroutine check_equal_char(this, case, actual, expected, test_parameter, quantity)
+        use :: type_testParameter
+        implicit none
+        class(test_results_type), intent(inout) :: this
+            !! passed dummy argument
+        integer(int32), intent(in) :: case
+            !! a test case number
+        character(*), intent(in) :: actual
+            !! the actual value
+        character(*), intent(in) :: expected
+            !! the expected value
+        class(test_parameter_type), intent(in), optional :: test_parameter
+            !! the test parameter of the test case.
+            !! the arguments are appended to the failure message when passed
+        character(*), intent(in), optional :: quantity
+            !! the name of the quantity to be checked.
+            !! prepended to the failure message when passed
+
+        call store_result(this, case, (actual == expected), &
+                          "'"//actual//"'", "'"//expected//"'", &
+                          arguments_in(test_parameter), quantity)
+    end subroutine check_equal_char
+
+    !>composes a failure message from the actual and expected values in strings
+    !>and stores the result of a test case.
+    pure subroutine store_result(this, case, condition, actual_str, expected_str, arguments, quantity)
+        implicit none
+        class(test_results_type), intent(inout) :: this
+            !! passed dummy argument
+        integer(int32), intent(in) :: case
+            !! a test case number
+        logical, intent(in) :: condition
+            !! the result of the comparison
+        character(*), intent(in) :: actual_str
+            !! the actual value in a string
+        character(*), intent(in) :: expected_str
+            !! the expected value in a string
+        character(*), intent(in) :: arguments
+            !! the arguments of the test case.
+            !! appended to the failure message when not empty
+        character(*), intent(in), optional :: quantity
+            !! the name of the quantity to be checked
+
+        character(:), allocatable :: message
+
+        message = "expected "//expected_str//", but got "//actual_str
+        if (present(quantity)) then
+            message = quantity//": "//message
+        end if
+        if (len(arguments) > 0) then
+            message = message//" (arguments: "//arguments//")"
+        end if
+
+        call this%check_test(case, condition, message)
+    end subroutine store_result
+
+    !>returns the arguments of the test parameter in a string
+    !>and an empty string when `test_parameter` is not passed.
+    pure function arguments_in(test_parameter) result(args)
+        use :: type_testParameter
+        implicit none
+        class(test_parameter_type), intent(in), optional :: test_parameter
+            !! the test parameter of a test case
+        character(:), allocatable :: args
+            !! the arguments in a string
+
+        if (present(test_parameter)) then
+            args = test_parameter%arguments()
+        else
+            args = ""
+        end if
+    end function arguments_in
+
+    !>returns `"T"` when the input is `.true.` and `"F"` otherwise.
+    pure function logical_to_string(l) result(str)
+        implicit none
+        logical, intent(in) :: l
+            !! the logical value to be converted
+        character(1) :: str
+            !! the converted string
+
+        if (l) then
+            str = "T"
+        else
+            str = "F"
+        end if
+    end function logical_to_string
 
     !>returns the number of test cases.
     pure function get_number_of_test_cases(this) result(num)
