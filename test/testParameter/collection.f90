@@ -5,6 +5,7 @@ module test_testParameter_collection
     use :: test_testParameter_unitTests_expected
     use :: test_testParameter_unitTests_presented
     use :: test_testParameter_unitTests_newTestParameter
+    use :: test_testParameter_unitTests_get
     implicit none
     private
     public :: collect_testParameter
@@ -34,6 +35,19 @@ contains
                      , new_unittest("new_test_parameter(), "// &
                                     "it should return a 'test_parameter_type' instance having configured namelists.", &
                                     newTestParam_should_return_instance_that_having_namelists) &
+                     , new_unittest("get(), it should read scalar values of intrinsic types.", &
+                                    get_should_read_scalar_values_of_intrinsic_types) &
+                     , new_unittest("get(), it should read values from the expected namelist.", &
+                                    get_should_read_values_from_expected_namelist) &
+                     , new_unittest("get(), it should read rank-1 arrays.", &
+                                    get_should_read_rank1_arrays) &
+                     , new_unittest("get(), it should set found to false and keep the default value "// &
+                                    "when the name is not found.", &
+                                    get_should_set_found_false_and_keep_default_when_not_found) &
+                     , new_unittest("get(), it should read values written with spaces around '='.", &
+                                    get_should_read_values_written_with_spaces_around_equals) &
+                     , new_unittest("get(), it should read quoted and unquoted strings.", &
+                                    get_should_read_quoted_and_unquoted_strings) &
                      ]
     end subroutine collect_testParameter
 end module test_testParameter_collection
