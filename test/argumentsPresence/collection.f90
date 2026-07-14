@@ -7,6 +7,7 @@ module test_argumentsPresence_collection
     use :: test_argumentsPresence_unitTests_newArgumentsPresence
     use :: test_argumentsPresence_unitTests_get
     use :: test_argumentsPresence_unitTests_asString
+    use :: test_argumentsPresence_unitTests_asIndex
     implicit none
     private
     public :: collect_argumentsPresence
@@ -23,6 +24,7 @@ contains
         type(unittest_type), allocatable :: test_suite_lt(:)
         type(unittest_type), allocatable :: test_suite_get(:)
         type(unittest_type), allocatable :: test_suite_asStr(:)
+        type(unittest_type), allocatable :: test_suite_asIdx(:)
 
         test_suite_ll = [ &
                         new_unittest("eqv_logical_logical(), it should return true "// &
@@ -183,6 +185,11 @@ contains
                                           toString_should_return_blank_when_arg_pres_is_not_initialized) &
                            ]
 
+        test_suite_asIdx = [ &
+                           new_unittest("as_index(), it should return the bit pattern of presence statuses.", &
+                                        asIndex_should_return_bit_pattern_of_presence_statuses) &
+                           ]
+
         test_suite = [test_suite_ll, test_suite_tl, test_suite_lt, test_suite_tt &
                       , new_unittest("argumets_presence(), "// &
                                      "it should return a 'arguments_presence_type' instance.", &
@@ -190,7 +197,7 @@ contains
                       , new_unittest("argumets_presence(), "// &
                                      "it should return a 'arguments_presence_type' instance having presence statuses.", &
                                      argsPres_should_return_instance_that_having_presence_status) &
-                      , test_suite_get, test_suite_asStr &
+                      , test_suite_get, test_suite_asStr, test_suite_asIdx &
                       ]
     end subroutine collect_argumentsPresence
 end module test_argumentsPresence_collection
